@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.eugenedolgushev.workhub">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".Activities.AuthorizationActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Activities.PlansActivity" />
+        <activity android:name=".Activities.OfficesActivity" />
+        <activity android:name=".Activities.ChooseDaysActivity" />
+        <activity android:name=".Activities.ChooseTimeActivity" />
+        <activity android:name=".Activities.OrderInfoActivity" />
+        <activity android:name=".Activities.CardPayActivity" />
+        <activity android:name=".Activities.PayResultActivity" />
+        <activity
+            android:name=".Activities.MyReservationsActivity"
+            android:label="@string/title_activity_my_reservations2"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activities.MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+    </application>
+
+</manifest>

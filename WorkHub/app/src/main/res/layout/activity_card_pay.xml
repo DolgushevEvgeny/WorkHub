@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_card_pay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        tools:context="com.example.eugenedolgushev.workhub.Activities.CardPayActivity"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Номер карты"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1.0">
+
+            <com.example.eugenedolgushev.workhub.MyEditText
+                android:id="@+id/card_number_holder_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/_0000"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="4"/>
+
+            <com.example.eugenedolgushev.workhub.MyEditText
+                android:id="@+id/card_number_holder_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/_0000"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="4"/>
+
+            <com.example.eugenedolgushev.workhub.MyEditText
+                android:id="@+id/card_number_holder_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/_0000"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="4"/>
+
+            <com.example.eugenedolgushev.workhub.MyEditText
+                android:id="@+id/card_number_holder_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/_0000"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="4"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Срок действия карты"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.example.eugenedolgushev.workhub.MyEditText
+                android:id="@+id/card_valid_period_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="ММ"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="2"/>
+
+            <com.example.eugenedolgushev.workhub.MyEditText
+                android:id="@+id/card_valid_period_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="ГГ"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="2"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Владелец карты"/>
+
+        <com.example.eugenedolgushev.workhub.MyEditText
+            android:id="@+id/card_owner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="Имя Фамилия"
+            android:inputType="textPersonName"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Код безопасности ( CVC/CW2)"/>
+
+        <com.example.eugenedolgushev.workhub.MyEditText
+            android:id="@+id/card_safe_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="000"
+            android:inputType="number"
+            android:maxLength="3"/>
+
+        <Button
+            android:id="@+id/pay_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Оплатить"/>
+    </LinearLayout>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        android:progressDrawable="@drawable/circular_progress_bar"/>
+</RelativeLayout>
