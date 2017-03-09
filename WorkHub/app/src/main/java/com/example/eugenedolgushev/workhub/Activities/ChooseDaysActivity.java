@@ -104,14 +104,14 @@ public class ChooseDaysActivity extends AppCompatActivity {
                     builder.setTitle("Важное сообщение!")
                         .setMessage("Совпадений нет")
                         .setCancelable(false)
-                        .setNegativeButton("ОК, иду на кухню",
+                        .setPositiveButton("Продолжить",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     Intent intent = new Intent(ChooseDaysActivity.this, OrderInfoActivity.class);
                                     intent.putExtra("planName", planName);
                                     intent.putExtra("planPrice", planPrice);
                                     intent.putExtra("duration", reservations.size());
-                                    intent.putExtra("totalSum", Integer.parseInt(totalSumView.getText().toString()));
+                                    intent.putExtra("totalSum", calculateTotalSum());
                                     startActivityForResult(intent, 1);
                                     dialog.cancel();
                                 }
@@ -119,18 +119,22 @@ public class ChooseDaysActivity extends AppCompatActivity {
                     AlertDialog alert = builder.create();
                     alert.show();
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDaysActivity.this);
-                    builder.setTitle("Важное сообщение!")
-                            .setMessage("Есть совпадения в бронировании")
-                            .setCancelable(false)
-                            .setNegativeButton("ОК, иду на кухню",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    });
-                    AlertDialog alert = builder.create();
-                    alert.show();
+                    if (reservations.size() == 0) {
+                        Utils.showAlertDialog("Нужно сделать хотя бы 1 бронирование", m_context);
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDaysActivity.this);
+                        builder.setTitle("Важное сообщение!")
+                                .setMessage("Есть совпадения в бронировании")
+                                .setCancelable(false)
+                                .setPositiveButton("Буду исправлять",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                            }
+                                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                    }
                 }
             }
         });
