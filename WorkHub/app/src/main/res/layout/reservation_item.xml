@@ -44,13 +44,15 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.2">
+            android:layout_weight="0.2"
+            android:gravity="end"
+            android:paddingEnd="15dp">
 
             <Button
                 android:id="@+id/reservation_more_info_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:drawable/arrow_up_float"/>
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@android:drawable/arrow_up_float" />
         </LinearLayout>
     </LinearLayout>
 
