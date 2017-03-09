@@ -22,6 +22,7 @@ import com.example.eugenedolgushev.workhub.MyAdapter;
 import com.example.eugenedolgushev.workhub.MyOnClick;
 import com.example.eugenedolgushev.workhub.R;
 import com.example.eugenedolgushev.workhub.Reservation;
+import com.example.eugenedolgushev.workhub.Utils;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
@@ -66,24 +67,31 @@ public class ChooseDaysActivity extends AppCompatActivity {
         m_context = this;
 
         calendarView = (MaterialCalendarView) findViewById(R.id.calendarView);
-        calendarView.setSelectionColor(R.color.green);
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_MULTIPLE);
+        calendarView.setSelectionColor(R.color.green);
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                day = date.getDay();
-                month = date.getMonth() + 1;
-                year = date.getYear();
-                dayOfWeek = dayOfWeek(day, month, year);
+                long time = System.currentTimeMillis();
 
-                Intent intent = new Intent(ChooseDaysActivity.this, ChooseTimeActivity.class);
-                intent.putExtra("cityName", cityName);
-                intent.putExtra("officeName", officeName);
-                intent.putExtra("dayOfWeek", dayOfWeek);
-                intent.putExtra("planName", planName);
-                intent.putExtra("date", "" + day + "." + month + "." + year);
-                intent.putExtra("planPrice", planPrice);
-                startActivityForResult(intent, 1);
+                if (time > date.getDate().getTime()) {
+                    Utils.showAlertDialog("Нельзя занять", m_context);
+                    calendarView.setDateSelected(CalendarDay.from(year, month - 1, day), false);
+                } else if (time < date.getDate().getTime()) {
+                    day = date.getDay();
+                    month = date.getMonth() + 1;
+                    year = date.getYear();
+                    dayOfWeek = dayOfWeek(day, month, year);
+
+                    Intent intent = new Intent(ChooseDaysActivity.this, ChooseTimeActivity.class);
+                    intent.putExtra("cityName", cityName);
+                    intent.putExtra("officeName", officeName);
+                    intent.putExtra("dayOfWeek", dayOfWeek);
+                    intent.putExtra("planName", planName);
+                    intent.putExtra("date", "" + day + "." + month + "." + year);
+                    intent.putExtra("planPrice", planPrice);
+                    startActivityForResult(intent, 1);
+                }
             }
         });
 
