@@ -30,10 +30,17 @@ app.get('/getOffices', function(request, response) {
           officesCollection.find({'city': city}).toArray(function(err, records) {
             if (records) {
               console.log('Кол-во офисов: ' + records.length);
-              answer.records = records;
-              answer.code = 1;
-              db.close();
-              sendResponse(answer, response);
+              if (records.length) {
+                answer.records = records;
+                answer.code = 1;
+                db.close();
+                sendResponse(answer, response);
+              } else {
+                answer.code = 2;
+                answer.message = 'В данном городе пока еще нет офисов.';
+                db.close();
+                sendResponse(answer, response);
+              }
             } else {
               answer.code = 2;
               answer.message = 'В данном городе пока еще нет офисов.';
