@@ -17,6 +17,7 @@ import android.widget.ListView;
 import com.example.eugenedolgushev.workhub.R;
 import com.example.eugenedolgushev.workhub.Time;
 import com.example.eugenedolgushev.workhub.TimeList;
+import com.example.eugenedolgushev.workhub.Utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -36,7 +37,7 @@ import java.util.List;
 
 public class ChooseTimeActivity extends AppCompatActivity {
 
-    private Context context = null;
+    private Context m_context = null;
     private ListView timeListView = null;
     private Button takePlaceBtn = null;
 
@@ -51,6 +52,7 @@ public class ChooseTimeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_time);
+        setTitle("Выберите время");
 
         officeName = getIntent().getExtras().getString("officeName");
         cityName = getIntent().getExtras().getString("cityName");
@@ -59,7 +61,7 @@ public class ChooseTimeActivity extends AppCompatActivity {
         dayOfWeek = getIntent().getExtras().getInt("dayOfWeek");
         planPrice = getIntent().getExtras().getInt("planPrice");
 
-        context = this;
+        m_context = this;
 
         new getDayWorkTime().execute();
 
@@ -97,14 +99,18 @@ public class ChooseTimeActivity extends AppCompatActivity {
 
     @NotNull
     private Boolean checkTime() {
-        if (times.size() > 1) {
+        if (times.size() > 0) {
             for (int i = 0; i < times.size() - 1; ++i) {
                 int first = (int) times.get(i);
                 int second = (int) times.get(i+1);
                 if (first + 1 != second) {
+                    Utils.showAlertDialog("Время должно быть без пропусков", m_context);
                     return false;
                 }
             }
+        } else {
+            Utils.showAlertDialog("Ничего не выбрано", m_context);
+            return false;
         }
 
         return true;
@@ -189,10 +195,8 @@ public class ChooseTimeActivity extends AppCompatActivity {
         protected void onPostExecute(String strJson) {
             super.onPostExecute(strJson);
 
-            ArrayList<Time> times = null;
-            TimeList timeList = null;
-            times = new ArrayList<>();
-            timeList = new TimeList(context);
+            ArrayList<Time> times = new ArrayList<>();
+            TimeList timeList = new TimeList(m_context);
 
             JSONObject dataJsonObj = null;
             JSONArray list = null;
@@ -305,19 +309,7 @@ public class ChooseTimeActivity extends AppCompatActivity {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ChooseTimeActivity.this);
                         builder.setTitle("Важное сообщение!")
                             .setMessage("Нельзя занять место в " + nonReserveTime + "часов")
-                            .setCancelable(false)
-                            .setNegativeButton("ОК, иду на кухню",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    })
-                            .setPositiveButton("ОК, иду на кухню",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.cancel();
-                                        }
-                            });
+                            .setCancelable(false);
                         AlertDialog alert = builder.create();
                         alert.show();
                     }
@@ -328,23 +320,23 @@ public class ChooseTimeActivity extends AppCompatActivity {
                         .setMessage("Все свободно, можно занимать")
                         .setCancelable(false)
                         .setNegativeButton("ОК, пока еще подумаю",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                })
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            })
                         .setPositiveButton("ОК, занимаю",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Intent intent = new Intent();
-                                        int startTime = (int) times.get(0);
-                                        intent.putExtra("startTime", startTime);
-                                        intent.putExtra("duration", times.size());
-                                        setResult(1, intent);
-                                        finish();
-                                        dialog.cancel();
-                                    }
-                                });
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent();
+                                    int startTime = (int) times.get(0);
+                                    intent.putExtra("startTime", startTime);
+                                    intent.putExtra("duration", times.size());
+                                    setResult(1, intent);
+                                    dialog.cancel();
+                                    finish();
+                                }
+                            });
                     AlertDialog alert = builder.create();
                     alert.show();
                 }
