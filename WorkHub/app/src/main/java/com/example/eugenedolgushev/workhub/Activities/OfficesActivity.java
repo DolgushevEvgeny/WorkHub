@@ -3,8 +3,8 @@ package com.example.eugenedolgushev.workhub.Activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
@@ -26,6 +26,8 @@ public class OfficesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offices);
+        setTitle("Выберите офис");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         cityName = getIntent().getExtras().getString("cityName");
 
@@ -35,7 +37,6 @@ public class OfficesActivity extends AppCompatActivity {
         lvOffices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 ListAdapter officeListViewAdapter = lvOffices.getAdapter();
                 Office office = (Office) officeListViewAdapter.getItem(position);
 
@@ -58,12 +59,14 @@ public class OfficesActivity extends AppCompatActivity {
         getOfficeTask.execute(cityName, URL);
     }
 
-    private void showAlertDialog(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Ошибка")
-                .setMessage(message)
-                .setCancelable(true);
-        AlertDialog alert = builder.create();
-        alert.show();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

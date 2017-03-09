@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
@@ -26,6 +27,9 @@ public class PlansActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_plans);
+        setTitle("Выберите план");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         officeName = getIntent().getExtras().getString("officeName");
         cityName = getIntent().getExtras().getString("cityName");
 
@@ -56,5 +60,16 @@ public class PlansActivity extends AppCompatActivity {
         }, context);
 
         getPlansTask.execute(cityName, officeName, URL);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
