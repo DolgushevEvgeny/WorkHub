@@ -72,7 +72,8 @@
         android:text="Продолжить"/>
 
     <include
-        layout="@layout/test"
+        layout="@layout/chosen_reservation_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 </RelativeLayout>
