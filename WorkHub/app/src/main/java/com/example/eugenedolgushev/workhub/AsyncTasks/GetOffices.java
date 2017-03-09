@@ -1,5 +1,6 @@
 package com.example.eugenedolgushev.workhub.AsyncTasks;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -166,7 +167,7 @@ public class GetOffices extends AsyncTask<String, Void, String> {
             if (jsonObj.has("message")) {
                 message = jsonObj.getString("message");
             }
-            Utils.showAlertDialog(message, m_context);
+            Utils.showAlertDialog(message, m_context, (Activity) m_context);
         } catch(JSONException e) {
             e.printStackTrace();
         }

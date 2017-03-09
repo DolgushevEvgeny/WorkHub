@@ -35,7 +35,7 @@ public class OfficesActivity extends AppCompatActivity {
         lvOffices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int idTest = view.getId();
+
                 ListAdapter officeListViewAdapter = lvOffices.getAdapter();
                 Office office = (Office) officeListViewAdapter.getItem(position);
 

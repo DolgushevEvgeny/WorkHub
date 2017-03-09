@@ -1,5 +1,6 @@
 package com.example.eugenedolgushev.workhub.AsyncTasks;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -25,15 +26,15 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class GetPlans extends AsyncTask<String, Void, String> {
 
-    private Context m_context = null;
-    private AsyncResponse delegate = null;
+    private Context m_context;
+    private AsyncResponse m_delegate;
 
     public interface AsyncResponse {
         void processFinish(PlanList planList);
     }
 
     public GetPlans(AsyncResponse delegate, Context context){
-        this.delegate = delegate;
+        this.m_delegate = delegate;
         this.m_context = context;
     }
 
@@ -115,7 +116,7 @@ public class GetPlans extends AsyncTask<String, Void, String> {
             planList.setList(plans);
         }
 
-        delegate.processFinish(planList);
+        m_delegate.processFinish(planList);
     }
 
     private ArrayList<Plan> fullPlanList(JSONObject jsonObj) {
@@ -162,7 +163,7 @@ public class GetPlans extends AsyncTask<String, Void, String> {
             if (jsonObj.has("message")) {
                 message = jsonObj.getString("message");
             }
-            Utils.showAlertDialog(message, m_context);
+            Utils.showAlertDialog(message, m_context, (Activity) m_context);
         } catch(JSONException e) {
             e.printStackTrace();
         }
