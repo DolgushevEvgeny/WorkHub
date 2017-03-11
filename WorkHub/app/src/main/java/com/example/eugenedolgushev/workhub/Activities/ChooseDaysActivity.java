@@ -39,6 +39,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.example.eugenedolgushev.workhub.Activities.AuthorizationActivity.SHARED_PREFERENCES_NAME;
+
 public class ChooseDaysActivity extends AppCompatActivity {
     private MaterialCalendarView calendarView = null;
     private Button continueBtn = null, reservationListBtn = null, closeListBtn = null;
@@ -112,8 +114,9 @@ public class ChooseDaysActivity extends AppCompatActivity {
                                     intent.putExtra("planPrice", planPrice);
                                     intent.putExtra("duration", reservations.size());
                                     intent.putExtra("totalSum", calculateTotalSum());
-                                    startActivityForResult(intent, 1);
+                                    intent.putStringArrayListExtra("reservations", makeJson());
                                     dialog.cancel();
+                                    startActivityForResult(intent, 1);
                                 }
                             });
                     AlertDialog alert = builder.create();
@@ -185,6 +188,8 @@ public class ChooseDaysActivity extends AppCompatActivity {
                 int startTime = data.getExtras().getInt("startTime");
                 int duration = data.getExtras().getInt("duration");
                 Reservation reservation = new Reservation();
+                reservation.setOfficeCity(cityName);
+                reservation.setOfficeName(officeName);
                 reservation.setStartTime(startTime);
                 reservation.setDuration(duration);
                 reservation.setReservationDay(day);
@@ -265,7 +270,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
             }
 
             SharedPreferences sPref = getApplicationContext()
-                    .getSharedPreferences(AuthorizationActivity.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+                    .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
             String savedUserID = sPref.getString("userID", "");
 
@@ -357,5 +362,28 @@ public class ChooseDaysActivity extends AppCompatActivity {
         String days[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         int a = (14 - month) / 12, y = year - a, m = month + 12 * a - 2;
         return ((7000 + (day + y + y / 4 - y / 100 + y / 400 + (31 * m) / 12)) % 7) - 1;
+    }
+
+    private ArrayList<String> makeJson() {
+        SharedPreferences sPref = getApplicationContext()
+                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+
+        String savedUserID = sPref.getString("userID", "");
+        ArrayList<String> resultReservations = new ArrayList<>();
+        for (int i = 0; i < reservations.size(); ++i) {
+            Reservation reservation = reservations.get(i);
+            String object = "{ ";
+            object += "\"office\" : \"" + reservation.getOfficeName() + "\", " +
+                    "\"city\" : \"" + reservation.getOfficeCity() + "\", " +
+                    "\"plan\" : \"" + reservation.getReservationPlanName() + "\", " +
+                    "\"date\" : \"" + reservation.getReservationDate() + "\", " +
+                    "\"startTime\" : " + reservation.getStartTime() + ", " +
+                    "\"duration\" : " + reservation.getDuration() + ", " +
+                    "\"planPrice\" : " + reservation.getReservationSum() / reservation.getDuration() + ", " +
+                    "\"userID\" : \"" + savedUserID + "\" }";
+            resultReservations.add(object);
+        }
+
+        return resultReservations;
     }
 }
