@@ -5,6 +5,7 @@ var http = require("http");
 var express = require('express');
 var ObjectId = require('mongodb').ObjectID;
 var MongoClient = require('mongodb').MongoClient;
+var nodeMailer = require("nodemailer");
 
 var app = express();
 
@@ -192,14 +193,12 @@ app.get('/canMakeReservation', function(request, response) {
   console.log(planPrice);
   console.log(userID);
 
-  var answer = {};
-  var list = [];
-
-  var listTimes = [];
+  var list = [], listTimes = [];
   for (var i = startTime; i < startTime + duration; ++i) {
     listTimes.push(i);
   }
 
+  var answer = {};
   MongoClient.connect("mongodb://localhost:27017/workhubDB", function(err, db) {
     if (!err) {
       var plansCollection = db.collection('plans');
@@ -232,8 +231,7 @@ app.get('/canMakeReservation', function(request, response) {
               }
 
               console.log(list);
-              var canReserve = true;
-              var nonReserveTime = 0;
+              var canReserve = true, nonReserveTime = [];
               for (var i = 0; i < listTimes.length; ++i) {
                 var listItem = getListItem(list, listTimes[i]);
                 if (listItem.count < planCapacity) {
@@ -241,16 +239,12 @@ app.get('/canMakeReservation', function(request, response) {
                   setListItem(list, listItem, listTimes[i]);
                 } else {
                   canReserve = false;
-                  nonReserveTime = listTimes[i];
-                  for (var j = 0; j < i; ++j) {
-                    removeReserve(list, listTimes[j])
-                  }
-                  break;
+                  nonReserveTime.push(listTimes[i]);
                 }
               }
+
               canReserve ? console.log('Можно занять') : console.log('Нельзя занять');
               if (canReserve) {
-                setReservation(reservationsCollection, cityName, officeName, planName, date, startTime, duration, planPrice, userID);
                 answer.code = 1;
               } else {
                 answer.code = 0;
@@ -260,7 +254,6 @@ app.get('/canMakeReservation', function(request, response) {
               db.close();
               sendResponse(answer, response);
             } else {
-              setReservation(reservationsCollection, cityName, officeName, planName, date, startTime, duration, planPrice, userID);
               answer.code = 1;
 
               db.close();
@@ -322,9 +315,116 @@ app.get('/MyReservations', function(request, response) {
           sendResponse(answer, response);
         }
       });
+    } else {
+      //TODO обработать ошибку
     }
   });
 });
+
+app.get('/canTakePlace', function(request, response) {
+  console.log("Request get /canTakePlace received.");
+  var reservationJson = request.query.reservation;
+  var reservation = JSON.parse(reservationJson);
+
+  var list = [], listTimes = fillTimeList(reservation.startTime, reservation.duration), answer = {};
+
+  MongoClient.connect("mongodb://localhost:27017/workhubDB", function(err, db) {
+    if (!err) {
+      var plansCollection = db.collection('plans');
+      var city = reservation.city, office = reservation.office, plan = reservation.plan;
+      plansCollection.findOne({'city': city, 'office': office, 'name': plan}, function(err, record) {
+        if (!err) {
+          var planCapacity = +record.capacity;
+          console.log('кол-во мест: ' + planCapacity);
+          var reservationsCollection = db.collection('reservations');
+          reservationsCollection.find({'city': reservation.city, 'office': reservation.office,
+            'plan': reservation.plan, 'date': reservation.date}).toArray(function(err, records) {
+              if (records) {
+                if (records.length) {
+                  console.log('всего бронирований на день: ' + records.length);
+                  for (var i = 0; i < records.length; ++i) {
+                    var itemStartTime = +records[i].startTime, itemDuration = +records[i].duration;
+
+                    for (var j = itemStartTime; j < itemStartTime + itemDuration; ++j) {
+                      var listItem = getListItem(list, j);
+                      listItem.hour = j;
+                      listItem.count += 1;
+                      list = setListItem(list, listItem, j);
+                    }
+                  }
+
+                  var canReserve = true, nonReserveTime = [];
+                  for (var i = 0; i < listTimes.length; ++i) {
+                    var listItem = getListItem(list, listTimes[i]);
+                    if (listItem.count < planCapacity) {
+                      listItem.count += 1;
+                      setListItem(list, listItem, listTimes[i]);
+                    } else {
+                      canReserve = false;
+                      nonReserveTime.push(listTimes[i]);
+                    }
+                  }
+
+                  if (canReserve) {
+                    setReservation(reservationsCollection, reservation.city, reservation.office,
+                      reservation.plan, reservation.date, reservation.startTime, reservation.duration,
+                      reservation.planPrice, reservation.userID);
+                    sendEmail();
+                    answer.code = 1;
+                  } else {
+                    answer.code = 0;
+                    answer.date = reservation.date;
+                    answer.nonReserveTimes = nonReserveTime;
+                  }
+
+                  console.log(answer);
+                  db.close();
+                  sendResponse(answer, response);
+                } else {
+                  setReservation(reservationsCollection, reservation.city, reservation.office,
+                    reservation.plan, reservation.date, reservation.startTime, reservation.duration,
+                    reservation.planPrice, reservation.userID);
+                  sendEmail();
+                  answer.code = 1;
+                  db.close();
+                  sendResponse(answer, response);
+                }
+              } else {
+                answer.code = 2;
+                db.close();
+                sendResponse(answer, response);
+              }
+          });
+        }
+      });
+    }
+  });
+});
+
+function sendEmail() {
+  var transporter = nodeMailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'baraxlush1995@gmail.com',
+      pass: 'warmachine1995'
+    }
+  });
+
+  var mailOptions = {
+    from: '"WorkHub" <baraxlush1995@gmail.com>',
+    to: 'eugene.dolgushev@gmail.com',
+    subject: 'Здесь наверно заголовок',
+    text: 'А здесь надеюсь будет содержимое сообщения',
+    html: '<b>Hello world</b>'
+  };
+
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+        return console.log(error);
+    }
+    console.log('Message %s sent: %s', info.messageId, info.response);
+  });
+}
 
 function getListItem(list, hour) {
   for (var i = 0; i < list.length; ++i) {
@@ -371,6 +471,14 @@ function setReservationFields(cityName, officeName, planName, date, startTime, d
   reservation.planPrice = planPrice;
   reservation.userID = userID;
   return reservation;
+}
+
+function fillTimeList(startTime, duration) {
+  var timeList = [];
+  for (var i = startTime; i < startTime + duration; ++i) {
+    timeList.push(i);
+  }
+  return timeList;
 }
 
 function sendResponse(answer, response) {
