@@ -9,12 +9,15 @@ import android.widget.TextView;
 
 import com.example.eugenedolgushev.workhub.R;
 
+import java.util.ArrayList;
+
 public class OrderInfoActivity extends AppCompatActivity {
     private Button cardPayBtn = null;
     private TextView yourPlanView = null, yourPriceView = null, yourDurationView = null, totalSumView = null;
 
     private String planName = "";
     private Integer planPrice = 0, duration = 0, totalSum = 0;
+    private ArrayList<String> reservations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +28,7 @@ public class OrderInfoActivity extends AppCompatActivity {
         planPrice = getIntent().getExtras().getInt("planPrice");
         duration = getIntent().getExtras().getInt("duration");
         totalSum = getIntent().getExtras().getInt("totalSum");
+        reservations = getIntent().getExtras().getStringArrayList("reservations");
 
         yourPlanView = (TextView) findViewById(R.id.your_plan);
         yourPlanView.setText(planName);
@@ -43,6 +47,7 @@ public class OrderInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(OrderInfoActivity.this, CardPayActivity.class);
+                intent.putStringArrayListExtra("reservations", reservations);
                 startActivityForResult(intent, 1);
             }
         });

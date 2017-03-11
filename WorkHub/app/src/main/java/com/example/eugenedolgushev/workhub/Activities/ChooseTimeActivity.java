@@ -295,8 +295,7 @@ public class ChooseTimeActivity extends AppCompatActivity {
             super.onPostExecute(strJson);
 
             JSONObject dataJsonObj = null;
-            Integer code = 0, nonReserveTime = 0;
-
+            Integer code = 0;
             try {
                 dataJsonObj = new JSONObject(strJson);
                 if (dataJsonObj.has("code")) {
@@ -305,11 +304,16 @@ public class ChooseTimeActivity extends AppCompatActivity {
                 if (code == 0) {
                     if (dataJsonObj.has("nonReserve")) {
                         canReserve = false;
-                        nonReserveTime = dataJsonObj.getInt("nonReserve");
+                        JSONArray nonReserveTime = dataJsonObj.getJSONArray("nonReserve");
+                        String times = "";
+                        for (int i = 0; i < nonReserveTime.length(); ++i) {
+                            times += nonReserveTime.get(i);
+                            times += (i < nonReserveTime.length() - 1) ? ", " : "";
+                        }
                         AlertDialog.Builder builder = new AlertDialog.Builder(ChooseTimeActivity.this);
                         builder.setTitle("Важное сообщение!")
-                            .setMessage("Нельзя занять место в " + nonReserveTime + "часов")
-                            .setCancelable(false);
+                            .setMessage("Нельзя занять место в " + times + " часов")
+                            .setCancelable(true);
                         AlertDialog alert = builder.create();
                         alert.show();
                     }
