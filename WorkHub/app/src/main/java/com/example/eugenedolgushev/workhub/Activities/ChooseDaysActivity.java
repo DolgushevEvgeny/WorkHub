@@ -69,7 +69,6 @@ public class ChooseDaysActivity extends AppCompatActivity {
         m_context = this;
 
         calendarView = (MaterialCalendarView) findViewById(R.id.calendarView);
-        calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_MULTIPLE);
         calendarView.setSelectionColor(R.color.green);
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
