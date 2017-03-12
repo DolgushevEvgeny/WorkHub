@@ -11,26 +11,20 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
+import com.example.eugenedolgushev.workhub.AsyncTasks.GetMyReservations;
 import com.example.eugenedolgushev.workhub.R;
 import com.example.eugenedolgushev.workhub.Reservation;
-import com.example.eugenedolgushev.workhub.ReservationList;
+import com.example.eugenedolgushev.workhub.ReservationsAdapter;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.eugenedolgushev.workhub.Activities.AuthorizationActivity.SHARED_PREFERENCES_NAME;
 
@@ -42,7 +36,10 @@ public class MyReservationsActivity extends AppCompatActivity
 
     private static final String cityName = "Йошкар-Ола";
     private static final String URL = "http://192.168.0.32:3000/MyReservations";
-    private ListView lvReservations = null;
+    private RecyclerView lvReservations = null;
+    private ReservationsAdapter reservationsAdapter;
+    private List<Reservation> reservations = new ArrayList<Reservation>();
+    private GetMyReservations getMyReservationsTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +62,10 @@ public class MyReservationsActivity extends AppCompatActivity
             }
         });
 
-        lvReservations = (ListView) findViewById(R.id.reservations_list_view);
-        lvReservations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });
+        lvReservations = (RecyclerView) findViewById(R.id.reservations_list_view);
+        lvReservations.setLayoutManager(new LinearLayoutManager(this));
+        reservationsAdapter = new ReservationsAdapter((ArrayList) reservations);
+        lvReservations.setAdapter(reservationsAdapter);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -82,13 +76,24 @@ public class MyReservationsActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        new LoadReservations().execute();
+        getMyReservationsTask = new GetMyReservations(new GetMyReservations.AsyncResponse() {
+            @Override
+            public void processFinish(ArrayList<Reservation> reservations) {
+                reservationsAdapter.setList(reservations);
+                lvReservations.setAdapter(reservationsAdapter);
+            }
+        }, m_context);
+
+        getMyReservationsTask.execute(URL);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        new LoadReservations().execute();
+        AsyncTask.Status status = getMyReservationsTask.getStatus();
+        if (status.name().equals("FINISHED")) {
+            getMyReservationsTask.execute(URL);
+        }
     }
 
     @Override
@@ -150,105 +155,5 @@ public class MyReservationsActivity extends AppCompatActivity
         SharedPreferences.Editor editor = sPref.edit();
         editor.remove(key);
         editor.commit();
-    }
-
-    class LoadReservations extends AsyncTask<Context, Void, String> {
-
-        String resultJson = "";
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(Context... params) {
-            SharedPreferences sPref = getApplicationContext()
-                    .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-
-            String savedUserID = sPref.getString("userID", "");
-            String param = "userID=" + savedUserID;
-            try {
-                java.net.URL requestUrl = new URL(URL + "/?" + param);
-
-                HttpURLConnection connection = null;
-                connection = (HttpURLConnection) requestUrl.openConnection();
-                connection.setRequestMethod("GET");
-
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    BufferedReader readerBuf = null;
-                    readerBuf = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-                    String line = "";
-                    StringBuffer buffer = new StringBuffer();
-                    while((line = readerBuf.readLine()) != null) {
-                        buffer.append(line);
-                    }
-
-                    resultJson = buffer.toString();
-                }
-            }
-            catch(Exception e) {
-                e.printStackTrace();
-            }
-
-            return resultJson;
-        }
-
-        @Override
-        protected void onPostExecute(String strJson) {
-            super.onPostExecute(strJson);
-
-            ArrayList<Reservation> reservations = new ArrayList<>();
-            ReservationList reservationList = new ReservationList(m_context);
-
-            JSONObject dataJsonObj;
-            JSONArray list;
-
-            try {
-                dataJsonObj = new JSONObject(strJson);
-                if (dataJsonObj.has("records")) {
-                    list = dataJsonObj.getJSONArray("records");
-                } else {
-                    return;
-                }
-
-                for (int i = 0; i < list.length(); ++i){
-                    Reservation reservation = new Reservation();
-                    JSONObject recordJsonObj = list.getJSONObject(i);
-                    if (recordJsonObj.has("city")) {
-                        reservation.setOfficeCity(recordJsonObj.getString("city"));
-                    }
-                    if (recordJsonObj.has("plan")) {
-                        reservation.setReservationPlanName(recordJsonObj.getString("plan"));
-                    }
-                    if (recordJsonObj.has("office")) {
-                        reservation.setOfficeName(recordJsonObj.getString("office"));
-                    }
-                    if (recordJsonObj.has("date")) {
-                        reservation.setReservationDate(recordJsonObj.getString("date"));
-                    }
-                    if (recordJsonObj.has("startTime")) {
-                        reservation.setStartTime(recordJsonObj.getInt("startTime"));
-                    }
-                    if (recordJsonObj.has("duration")) {
-                        reservation.setDuration(recordJsonObj.getInt("duration"));
-                    }
-                    if (recordJsonObj.has("planPrice")) {
-                        reservation.setReservationSum(recordJsonObj.getInt("planPrice") *
-                                reservation.getDuration());
-                    }
-
-                    reservations.add(reservation);
-                }
-            } catch(JSONException e) {
-                e.printStackTrace();
-            }
-
-            reservationList.setList(reservations);
-            if (lvReservations != null) {
-                lvReservations.setAdapter(reservationList);
-            }
-        }
     }
 }
