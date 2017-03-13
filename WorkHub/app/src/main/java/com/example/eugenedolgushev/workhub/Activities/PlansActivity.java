@@ -18,9 +18,9 @@ import com.example.eugenedolgushev.workhub.R;
 public class PlansActivity extends AppCompatActivity {
 
     private static final String URL = "http://192.168.0.32:3000/getPlans";
-    private String officeName = "", cityName = "";
+    private String officeName = "", cityName = "", officeAddress = "";
 
-    private Context context = null;
+    private Context m_context = null;
     private ListView planListView = null;
 
     @Override
@@ -32,8 +32,9 @@ public class PlansActivity extends AppCompatActivity {
 
         officeName = getIntent().getExtras().getString("officeName");
         cityName = getIntent().getExtras().getString("cityName");
+        officeAddress = getIntent().getExtras().getString("officeAddress");
 
-        context = this;
+        m_context = this;
 
         planListView = (ListView) findViewById(R.id.planActivityListView);
         planListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -44,6 +45,7 @@ public class PlansActivity extends AppCompatActivity {
                 Intent intent = new Intent(PlansActivity.this, ChooseDaysActivity.class);
                 intent.putExtra("cityName", cityName);
                 intent.putExtra("officeName", officeName);
+                intent.putExtra("officeAddress", officeAddress);
                 intent.putExtra("planPrice", plan.getPlanPrice());
                 intent.putExtra("planName", plan.getPlanName());
                 startActivity(intent);
@@ -57,7 +59,7 @@ public class PlansActivity extends AppCompatActivity {
                     planListView.setAdapter(planList);
                 }
             }
-        }, context);
+        }, m_context);
 
         getPlansTask.execute(cityName, officeName, URL);
     }

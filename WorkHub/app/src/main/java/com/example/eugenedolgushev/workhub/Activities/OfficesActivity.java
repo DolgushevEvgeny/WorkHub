@@ -43,6 +43,7 @@ public class OfficesActivity extends AppCompatActivity {
                 Intent intent = new Intent(OfficesActivity.this, PlansActivity.class);
                 intent.putExtra("cityName", cityName);
                 intent.putExtra("officeName", office.getOfficeName());
+                intent.putExtra("officeAddress", office.getOfficeAddress());
                 startActivity(intent);
             }
         });
