@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.example.eugenedolgushev.workhub.AsyncTasks.CanTakePlace;
 import com.example.eugenedolgushev.workhub.R;
 import com.example.eugenedolgushev.workhub.Time;
 import com.example.eugenedolgushev.workhub.TimeList;
@@ -35,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.example.eugenedolgushev.workhub.Activities.AuthorizationActivity.SHARED_PREFERENCES_NAME;
+
 public class ChooseTimeActivity extends AppCompatActivity {
 
     private Context m_context = null;
@@ -42,11 +45,9 @@ public class ChooseTimeActivity extends AppCompatActivity {
     private Button takePlaceBtn = null;
 
     private static final String url = "http://192.168.0.32:3000/getDayWorkTime";
-    private static final String url1 = "http://192.168.0.32:3000/canMakeReservation";
-    private String officeName = "", cityName = "", planName = "", date = "";
+    private String officeName = "", cityName = "", planName = "", date = "", officeAddress = "";
     private Integer dayOfWeek = 0, planPrice = 0;
-    private List times = new ArrayList<Integer>();
-    private Boolean canReserve = true;
+    private List timesList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,7 @@ public class ChooseTimeActivity extends AppCompatActivity {
         date = getIntent().getExtras().getString("date");
         dayOfWeek = getIntent().getExtras().getInt("dayOfWeek");
         planPrice = getIntent().getExtras().getInt("planPrice");
+        officeAddress = getIntent().getExtras().getString("officeAddress");
 
         m_context = this;
 
@@ -74,13 +76,13 @@ public class ChooseTimeActivity extends AppCompatActivity {
                 if (!time.isTimeChoose()) {
                     view.setBackgroundColor(2131427347);
                     time.chooseTime(true);
-                    times.add(time.getTime());
-                    Collections.sort(times);
+                    timesList.add(time.getTime());
+                    Collections.sort(timesList);
                 } else {
                     view.setBackgroundColor(0);
                     time.chooseTime(false);
-                    times.remove(time.getTime());
-                    Collections.sort(times);
+                    timesList.remove(time.getTime());
+                    Collections.sort(timesList);
                 }
             }
         });
@@ -90,19 +92,50 @@ public class ChooseTimeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (checkTime()) {
-                    new canMakeReservation().execute();
+                    final CanTakePlace canTakePlaceTask = new CanTakePlace(new CanTakePlace.AsyncResponse() {
+                        @Override
+                        public void processFinish(final ArrayList<String> dates, final ArrayList<Integer> times) {
+                            if (dates.size() == 0) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(ChooseTimeActivity.this);
+                                builder.setTitle("Важное сообщение!")
+                                    .setMessage("Все свободно, можно занимать")
+                                    .setCancelable(false)
+                                    .setNegativeButton("ОК, пока еще подумаю",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                            }
+                                        })
+                                    .setPositiveButton("ОК, занимаю",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent intent = new Intent();
+                                                int startTime = (int) timesList.get(0);
+                                                intent.putExtra("startTime", startTime);
+                                                intent.putExtra("duration", timesList.size());
+                                                setResult(1, intent);
+                                                dialog.cancel();
+                                                finish();
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            }
+                        }
+                    }, m_context);
+
+                    canTakePlaceTask.execute(makeJson());
                 }
             }
         });
-
     }
 
     @NotNull
     private Boolean checkTime() {
-        if (times.size() > 0) {
-            for (int i = 0; i < times.size() - 1; ++i) {
-                int first = (int) times.get(i);
-                int second = (int) times.get(i+1);
+        if (timesList.size() > 0) {
+            for (int i = 0; i < timesList.size() - 1; ++i) {
+                int first = (int) timesList.get(i);
+                int second = (int) timesList.get(i+1);
                 if (first + 1 != second) {
                     Utils.showAlertDialog("Время должно быть без пропусков", m_context);
                     return false;
@@ -231,122 +264,20 @@ public class ChooseTimeActivity extends AppCompatActivity {
         }
     }
 
-    class canMakeReservation extends AsyncTask<Context, Void, String> {
+    private String makeJson() {
+        SharedPreferences sPref = getApplicationContext()
+                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
-        String resultJson = "";
+        String savedUserID = sPref.getString("userID", "");
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(Context... params) {
-            HttpURLConnection connection = null;
-            InputStream is = null;
-            BufferedReader readerBuf = null;
-
-            String city = "", plan = "";
-            try {
-                city = URLEncoder.encode(cityName, "UTF-8");
-                plan = URLEncoder.encode(planName, "UTF-8");
-            } catch(UnsupportedEncodingException e) {
-
-            }
-
-            SharedPreferences sPref = getApplicationContext()
-                    .getSharedPreferences(AuthorizationActivity.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-
-            String savedUserID = sPref.getString("userID", "");
-
-            String requestParams = "city=" + city + "&office=" + officeName
-                    + "&plan=" + plan + "&date=" + date + "&startTime=" + getStartTime()
-                    + "&duration=" + getDuration() + "&planPrice=" + planPrice
-                    + "&userID=" + savedUserID;
-            try {
-                URL requestUrl = new URL(url1 + "/?" + requestParams);
-
-                connection = (HttpURLConnection) requestUrl.openConnection();
-                connection.setRequestMethod("GET");
-
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    is = connection.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
-
-                    readerBuf = new BufferedReader(new InputStreamReader(is));
-
-                    String line = "";
-                    while((line = readerBuf.readLine()) != null) {
-                        buffer.append(line);
-                    }
-
-                    resultJson = buffer.toString();
-                }
-            }
-            catch(Exception e) {
-                e.printStackTrace();
-            }
-
-            return resultJson;
-        }
-
-        @Override
-        protected void onPostExecute(String strJson) {
-            super.onPostExecute(strJson);
-
-            JSONObject dataJsonObj = null;
-            Integer code = 0;
-            try {
-                dataJsonObj = new JSONObject(strJson);
-                if (dataJsonObj.has("code")) {
-                    code = dataJsonObj.getInt("code");
-                }
-                if (code == 0) {
-                    if (dataJsonObj.has("nonReserve")) {
-                        canReserve = false;
-                        JSONArray nonReserveTime = dataJsonObj.getJSONArray("nonReserve");
-                        String times = "";
-                        for (int i = 0; i < nonReserveTime.length(); ++i) {
-                            times += nonReserveTime.get(i);
-                            times += (i < nonReserveTime.length() - 1) ? ", " : "";
-                        }
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ChooseTimeActivity.this);
-                        builder.setTitle("Важное сообщение!")
-                            .setMessage("Нельзя занять место в " + times + " часов")
-                            .setCancelable(true);
-                        AlertDialog alert = builder.create();
-                        alert.show();
-                    }
-                }
-                if (code == 1) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ChooseTimeActivity.this);
-                    builder.setTitle("Важное сообщение!")
-                        .setMessage("Все свободно, можно занимать")
-                        .setCancelable(false)
-                        .setNegativeButton("ОК, пока еще подумаю",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            })
-                        .setPositiveButton("ОК, занимаю",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Intent intent = new Intent();
-                                    int startTime = (int) times.get(0);
-                                    intent.putExtra("startTime", startTime);
-                                    intent.putExtra("duration", times.size());
-                                    setResult(1, intent);
-                                    dialog.cancel();
-                                    finish();
-                                }
-                            });
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                }
-            } catch(JSONException e) {
-                e.printStackTrace();
-            }
-        }
+        return "{ \"office\" : \"" + officeName + "\", " +
+                "\"city\" : \"" + cityName + "\", " +
+                "\"officeAddress\" : \"" + officeAddress + "\", " +
+                "\"plan\" : \"" + planName + "\", " +
+                "\"date\" : \"" + date + "\", " +
+                "\"startTime\" : " + getStartTime() + ", " +
+                "\"duration\" : " + getDuration() + ", " +
+                "\"planPrice\" : " + planPrice + ", " +
+                "\"userID\" : \"" + savedUserID + "\" }";
     }
 }
