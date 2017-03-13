@@ -50,7 +50,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
     private MyAdapter myAdapter;
 
     private static final String url = "http://192.168.0.32:3000/removeReservation";
-    private String officeName = "", cityName = "", planName = "";
+    private String officeName = "", cityName = "", planName = "", officeAddress = "";
     private Integer planPrice = 0;
     private List<Reservation> reservations = new ArrayList<Reservation>();
     private int day = 0, month = 0, year = 0, dayOfWeek = 0;
@@ -65,6 +65,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
         cityName = getIntent().getExtras().getString("cityName");
         planName = getIntent().getExtras().getString("planName");
         planPrice = getIntent().getExtras().getInt("planPrice");
+        officeAddress = getIntent().getExtras().getString("officeAddress");
 
         m_context = this;
 
@@ -91,6 +92,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
                     intent.putExtra("planName", planName);
                     intent.putExtra("date", "" + day + "." + month + "." + year);
                     intent.putExtra("planPrice", planPrice);
+                    intent.putExtra("officeAddress", officeAddress);
                     startActivityForResult(intent, 1);
                 }
             }
@@ -196,6 +198,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
                 reservation.setReservationYear(year);
                 reservation.setReservationPlanName(planName);
                 reservation.setReservationSum(planPrice * duration);
+                reservation.setOfficeAddress(officeAddress);
                 reservations.add(reservation);
 
                 updateViews();
@@ -374,6 +377,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
             String object = "{ ";
             object += "\"office\" : \"" + reservation.getOfficeName() + "\", " +
                     "\"city\" : \"" + reservation.getOfficeCity() + "\", " +
+                    "\"officeAddress\" : \"" + reservation.getOfficeAddress() + "\", " +
                     "\"plan\" : \"" + reservation.getReservationPlanName() + "\", " +
                     "\"date\" : \"" + reservation.getReservationDate() + "\", " +
                     "\"startTime\" : " + reservation.getStartTime() + ", " +
