@@ -112,6 +112,9 @@ public class GetMyReservations extends AsyncTask<String, Void, String> {
                     reservation.setReservationSum(recordJsonObj.getInt("planPrice") *
                             reservation.getDuration());
                 }
+                if (recordJsonObj.has("officeAddress")) {
+                    reservation.setOfficeAddress(recordJsonObj.getString("officeAddress"));
+                }
 
                 reservations.add(reservation);
             }
