@@ -3,8 +3,6 @@ package com.example.eugenedolgushev.workhub.AsyncTasks;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.example.eugenedolgushev.workhub.Utils;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,9 +21,10 @@ public class CanTakePlace extends AsyncTask<String, Void, String> {
     private static final String URL = "http://192.168.0.32:3000/canTakePlace";
     private ArrayList<String> dates = new ArrayList<>();
     private ArrayList<Integer> times = new ArrayList<>();
+    private String m_message = "";
 
     public interface AsyncResponse {
-        void processFinish(ArrayList<String> dates, ArrayList<Integer> times);
+        void processFinish(ArrayList<String> dates, ArrayList<Integer> times, String message);
     }
 
     public CanTakePlace(AsyncResponse delegate, Context context){
@@ -91,12 +90,15 @@ public class CanTakePlace extends AsyncTask<String, Void, String> {
                 case 2:
 
                     break;
+                case 3:
+                    sameReservation(dataJsonObj);
+                    break;
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        m_delegate.processFinish(dates, times);
+        m_delegate.processFinish(dates, times, m_message);
     }
 
     private void placeFree(JSONObject dataJsonObj) {
@@ -104,7 +106,6 @@ public class CanTakePlace extends AsyncTask<String, Void, String> {
     }
 
     private void placeNotFree(JSONObject dataJsonObj) {
-        String date = "", message = "";
         try {
             if (dataJsonObj.has("date")) {
                 dates.add(dataJsonObj.getString("date"));
@@ -116,8 +117,31 @@ public class CanTakePlace extends AsyncTask<String, Void, String> {
                 }
             }
             if (dataJsonObj.has("message")) {
-                message = dataJsonObj.getString("message");
-                Utils.showAlertDialog(message, m_context);
+                m_message = dataJsonObj.getString("message");
+                //Utils.showAlertDialog(message, m_context);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sameReservation(JSONObject dataJsonObj) {
+        String date = "", message = "";
+        Integer startTime = 0, duration = 0;
+        try {
+            if (dataJsonObj.has("date")) {
+                date = dataJsonObj.getString("date");
+                dates.add(dataJsonObj.getString("date"));
+            }
+            if (dataJsonObj.has("startTime")) {
+                startTime = dataJsonObj.getInt("startTime");
+            }
+            if (dataJsonObj.has("duration")) {
+                duration = dataJsonObj.getInt("duration");
+            }
+            if (dataJsonObj.has("message")) {
+                m_message = dataJsonObj.getString("message") + " : " + date + " с " + startTime + " до " + (startTime + duration);
+                //Utils.showAlertDialog(message, m_context);
             }
         } catch (JSONException e) {
             e.printStackTrace();
