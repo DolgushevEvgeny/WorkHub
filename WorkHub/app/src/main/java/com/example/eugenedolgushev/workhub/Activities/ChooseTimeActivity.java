@@ -94,7 +94,7 @@ public class ChooseTimeActivity extends AppCompatActivity {
                 if (checkTime()) {
                     final CanTakePlace canTakePlaceTask = new CanTakePlace(new CanTakePlace.AsyncResponse() {
                         @Override
-                        public void processFinish(final ArrayList<String> dates, final ArrayList<Integer> times) {
+                        public void processFinish(final ArrayList<String> dates, final ArrayList<Integer> times, String message) {
                             if (dates.size() == 0) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(ChooseTimeActivity.this);
                                 builder.setTitle("Важное сообщение!")
@@ -120,6 +120,8 @@ public class ChooseTimeActivity extends AppCompatActivity {
                                         });
                                 AlertDialog alert = builder.create();
                                 alert.show();
+                            } else {
+                                Utils.showAlertDialog(message, m_context);
                             }
                         }
                     }, m_context);
