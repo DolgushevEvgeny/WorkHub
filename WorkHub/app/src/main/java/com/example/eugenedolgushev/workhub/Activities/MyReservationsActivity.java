@@ -76,14 +76,7 @@ public class MyReservationsActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        getMyReservationsTask = new GetMyReservations(new GetMyReservations.AsyncResponse() {
-            @Override
-            public void processFinish(ArrayList<Reservation> reservations) {
-                reservationsAdapter.setList(reservations);
-                lvReservations.setAdapter(reservationsAdapter);
-            }
-        }, m_context);
-
+        getMyReservationsTask = getNewTask();
         getMyReservationsTask.execute(URL);
     }
 
@@ -92,8 +85,21 @@ public class MyReservationsActivity extends AppCompatActivity
         super.onResume();
         AsyncTask.Status status = getMyReservationsTask.getStatus();
         if (status.name().equals("FINISHED")) {
+            getMyReservationsTask = getNewTask();
             getMyReservationsTask.execute(URL);
         }
+    }
+
+    private GetMyReservations getNewTask() {
+        GetMyReservations getMyReservationsTask = new GetMyReservations(new GetMyReservations.AsyncResponse() {
+            @Override
+            public void processFinish(ArrayList<Reservation> reservations) {
+                reservationsAdapter.setList(reservations);
+                lvReservations.setAdapter(reservationsAdapter);
+            }
+        }, m_context);
+
+        return getMyReservationsTask;
     }
 
     @Override
