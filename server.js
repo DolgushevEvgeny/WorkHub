@@ -237,7 +237,8 @@ app.get('/canTakePlace', function(request, response) {
       var reservationsCollection = db.collection('reservations');
       reservationsCollection.find({'userID': reservation.userID}).toArray(function(err, records) {
         if (records) {
-          if (checkOnCollision(reservation.userID, reservation, records)) {
+          var result = checkOnCollision(reservation.userID, reservation, records);
+          if (result.canReserve) {
             var plansCollection = db.collection('plans');
             var city = reservation.city, office = reservation.office, plan = reservation.plan;
             plansCollection.findOne({'city': city, 'office': office, 'name': plan}, function(err, record) {
@@ -254,10 +255,6 @@ app.get('/canTakePlace', function(request, response) {
                             result = canReserveTime(listTimes, list, planCapacity),
                             canReserve = result.canReserve, nonReserveTime = result.nonReserveTime;
                         if (canReserve) {
-                          // setReservation(reservationsCollection, reservation.city, reservation.office,
-                          //   reservation.plan, reservation.date, reservation.startTime, reservation.duration,
-                          //   reservation.planPrice, reservation.officeAddress, reservation.userID);
-                          sendEmail();
                           answer.code = 1;
                         } else {
                           answer.code = 0;
@@ -268,10 +265,6 @@ app.get('/canTakePlace', function(request, response) {
                         db.close();
                         sendResponse(answer, response);
                       } else {
-                        // setReservation(reservationsCollection, reservation.city, reservation.office,
-                        //   reservation.plan, reservation.date, reservation.startTime, reservation.duration,
-                        //   reservation.planPrice, reservation.officeAddress, reservation.userID);
-                        sendEmail();
                         answer.code = 1;
                         db.close();
                         sendResponse(answer, response);
@@ -285,15 +278,34 @@ app.get('/canTakePlace', function(request, response) {
               }
             });
           } else {
-            answer.code = 0;
+            answer.code = 3;
             answer.message = 'У вас уже есть в это время бронирование';
-            answer.date = reservation.date;
+            answer.date = result.date;
+            answer.startTime = result.startTime;
+            answer.duration = result.duration;
             db.close();
             sendResponse(answer, response);
           }
         }
       });
     }
+  });
+});
+
+app.get('/setReservation', function(request, response) {
+  console.log("Request get /canTakePlace received.");
+  var reservation = JSON.parse(request.query.reservation);
+  var answer = {};
+  MongoClient.connect("mongodb://localhost:27017/workhubDB", function(err, db) {
+    if (!err) {
+      var reservationsCollection = db.collection('reservations');
+      setReservation(reservationsCollection, reservation.city, reservation.office,
+        reservation.plan, reservation.date, reservation.startTime, reservation.duration,
+        reservation.planPrice, reservation.officeAddress, reservation.userID);
+      sendEmail();
+    }
+    db.close();
+    sendResponse(answer, response);
   });
 });
 
@@ -330,6 +342,7 @@ function canReserveTime(listTimes, list, planCapacity) {
 
 function checkOnCollision(userID, reservation, records) {
   var firstDate = reservation.date.split('.');
+  var answer = {};
   for (var i = 0; i < records.length; ++i) {
     var myReservation = records[i];
     var secondDate = myReservation.date.split('.');
@@ -337,12 +350,17 @@ function checkOnCollision(userID, reservation, records) {
       if (checkCondition(reservation.startTime, reservation.duration, myReservation.startTime) ||
           checkCondition(myReservation.startTime, myReservation.duration, reservation.startTime)) {
             console.log("У вас уже есть бронирование в это время");
-            return false;
+            answer.canReserve = false;
+            answer.date = myReservation.date;
+            answer.startTime = myReservation.startTime;
+            answer.duration = myReservation.duration;
+            return answer;
       }
     }
   }
+  answer.canReserve = true;
   console.log("Можно занимать");
-  return true;
+  return answer;
 }
 
 function checkCondition(firstStartTime, firstDuration, secondStartTime) {
