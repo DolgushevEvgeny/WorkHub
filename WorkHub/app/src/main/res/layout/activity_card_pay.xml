@@ -27,7 +27,7 @@
             android:orientation="horizontal"
             android:weightSum="1.0">
 
-            <com.example.eugenedolgushev.workhub.MyEditText
+            <com.example.eugenedolgushev.workhub.MyViews.MyEditText
                 android:id="@+id/card_number_holder_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
                 android:inputType="number"
                 android:maxLength="4"/>
 
-            <com.example.eugenedolgushev.workhub.MyEditText
+            <com.example.eugenedolgushev.workhub.MyViews.MyEditText
                 android:id="@+id/card_number_holder_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
                 android:inputType="number"
                 android:maxLength="4"/>
 
-            <com.example.eugenedolgushev.workhub.MyEditText
+            <com.example.eugenedolgushev.workhub.MyViews.MyEditText
                 android:id="@+id/card_number_holder_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                 android:inputType="number"
                 android:maxLength="4"/>
 
-            <com.example.eugenedolgushev.workhub.MyEditText
+            <com.example.eugenedolgushev.workhub.MyViews.MyEditText
                 android:id="@+id/card_number_holder_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <com.example.eugenedolgushev.workhub.MyEditText
+            <com.example.eugenedolgushev.workhub.MyViews.MyEditText
                 android:id="@+id/card_valid_period_month"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -88,7 +88,7 @@
                 android:inputType="number"
                 android:maxLength="2"/>
 
-            <com.example.eugenedolgushev.workhub.MyEditText
+            <com.example.eugenedolgushev.workhub.MyViews.MyEditText
                 android:id="@+id/card_valid_period_year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"
             android:text="Владелец карты"/>
 
-        <com.example.eugenedolgushev.workhub.MyEditText
+        <com.example.eugenedolgushev.workhub.MyViews.MyEditText
             android:id="@+id/card_owner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:text="Код безопасности ( CVC/CW2)"/>
 
-        <com.example.eugenedolgushev.workhub.MyEditText
+        <com.example.eugenedolgushev.workhub.MyViews.MyEditText
             android:id="@+id/card_safe_code"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
