@@ -74,6 +74,7 @@ public class AuthorizationActivity extends AppCompatActivity {
 
         SharedPreferences.Editor editor = sPref.edit();
         editor.putString("userID", userID);
+        editor.putString("password", passwordField.getText().toString().trim());
         editor.commit();
     }
 
