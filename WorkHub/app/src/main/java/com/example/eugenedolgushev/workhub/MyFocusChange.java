@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 
+import com.example.eugenedolgushev.workhub.MyViews.MyEditText;
+
 public class MyFocusChange implements View.OnFocusChangeListener {
     Context m_context = null;
 
