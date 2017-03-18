@@ -73,10 +73,11 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         //holder.m_reservationOfficeAddressView.setText(m_reservationList.get(position).getOfficeAddress());
 
         holder.m_reservationDateMoreView.setText(createDate(position));
-        holder.m_reservationStartTimeMoreView.setText("Начало в " +
-                m_reservationList.get(position).getStartTime().toString() + " часов");
-        holder.m_reservationDurationMoreView.setText("Продолжительность " +
-                m_reservationList.get(position).getDuration().toString() + " часа(ов)");
+        holder.m_reservationStartTimeMoreView.setText("Время посещения с " +
+                m_reservationList.get(position).getStartTime().toString() + " до " +
+                (m_reservationList.get(position).getStartTime() + m_reservationList.get(position).getDuration()));
+//        holder.m_reservationDurationMoreView.setText("Продолжительность " +
+//                m_reservationList.get(position).getDuration().toString() + " часа(ов)");
         holder.m_reservationOfficeAddressMoreView.setText("Офис " + m_reservationList.get(position).getOfficeName() + ",  " +
                 m_reservationList.get(position).getOfficeAddress());
         holder.m_reservationStatusMoreView.setText(m_reservationList.get(position).getReservationStatus());

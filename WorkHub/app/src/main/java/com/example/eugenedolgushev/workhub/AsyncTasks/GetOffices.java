@@ -138,6 +138,11 @@ public class GetOffices extends AsyncTask<String, Void, String> {
                 if (recordJsonObj.has("address")) {
                     office.setOfficeAddress(recordJsonObj.getString("address"));
                 }
+                if (recordJsonObj.has("mapPosition")) {
+                    JSONArray location = recordJsonObj.getJSONArray("mapPosition");
+                    office.setLatitude(location.getDouble(0));
+                    office.setLongitude(location.getDouble(1));
+                }
 
                 offices.add(office);
             }

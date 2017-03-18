@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.example.eugenedolgushev.workhub.AsyncTasks.CanTakePlace;
-import com.example.eugenedolgushev.workhub.MyEditText;
+import com.example.eugenedolgushev.workhub.MyViews.MyEditText;
 import com.example.eugenedolgushev.workhub.MyFocusChange;
 import com.example.eugenedolgushev.workhub.R;
 import com.example.eugenedolgushev.workhub.Utils;

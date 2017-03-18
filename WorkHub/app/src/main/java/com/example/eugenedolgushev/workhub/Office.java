@@ -4,6 +4,7 @@ public class Office {
     private String m_cityName = "";
     private String m_officeAddress = "";
     private String m_OfficeName = "";
+    private Double m_latitude = (double) 0, m_longitude = (double) 0;
 
     public void setCityName(String cityName) {
         m_cityName = cityName;
@@ -27,5 +28,21 @@ public class Office {
 
     public String getOfficeName() {
         return m_OfficeName;
+    }
+
+    public void setLatitude(Double latitude) {
+        m_latitude = latitude;
+    }
+
+    public Double getLatitude() {
+        return m_latitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        m_longitude = longitude;
+    }
+
+    public Double getLongitude() {
+        return m_longitude;
     }
 }

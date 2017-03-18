@@ -40,10 +40,12 @@ public class OfficesActivity extends AppCompatActivity {
                 ListAdapter officeListViewAdapter = lvOffices.getAdapter();
                 Office office = (Office) officeListViewAdapter.getItem(position);
 
-                Intent intent = new Intent(OfficesActivity.this, PlansActivity.class);
+                Intent intent = new Intent(OfficesActivity.this, OfficeDetailInfoActivity.class);
                 intent.putExtra("cityName", cityName);
                 intent.putExtra("officeName", office.getOfficeName());
                 intent.putExtra("officeAddress", office.getOfficeAddress());
+                intent.putExtra("latitude", office.getLatitude());
+                intent.putExtra("longitude", office.getLongitude());
                 startActivity(intent);
             }
         });

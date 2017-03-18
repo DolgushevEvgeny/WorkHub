@@ -139,12 +139,17 @@ public class MyReservationsActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.naw_settings) {
-
+            goToSettings();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void goToSettings() {
+        Intent intent = new Intent(MyReservationsActivity.this, SettingActivity.class);
+        startActivity(intent);
     }
 
     private void logOut() {
