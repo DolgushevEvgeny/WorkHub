@@ -1,8 +1,9 @@
 package com.example.eugenedolgushev.workhub.Activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,11 +24,17 @@ import com.example.eugenedolgushev.workhub.AsyncTasks.GetMyReservations;
 import com.example.eugenedolgushev.workhub.R;
 import com.example.eugenedolgushev.workhub.Reservation;
 import com.example.eugenedolgushev.workhub.ReservationsAdapter;
+import com.example.eugenedolgushev.workhub.TimeNotification;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
-import static com.example.eugenedolgushev.workhub.Activities.AuthorizationActivity.SHARED_PREFERENCES_NAME;
+import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.Strings.MY_RESERVATIONS_URL;
+import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
+import static com.example.eugenedolgushev.workhub.Utils.removeSharedPreferences;
 
 public class MyReservationsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -34,8 +42,8 @@ public class MyReservationsActivity extends AppCompatActivity
     private Context m_context = null;
     private FloatingActionButton addReservationBtn = null;
 
-    private static final String cityName = "Йошкар-Ола";
-    private static final String URL = "http://192.168.0.32:3000/MyReservations";
+    private String cityName;
+    //private static final String URL = "http://192.168.0.32:3000/MyReservations";
     private RecyclerView lvReservations = null;
     private ReservationsAdapter reservationsAdapter;
     private List<Reservation> reservations = new ArrayList<Reservation>();
@@ -49,6 +57,8 @@ public class MyReservationsActivity extends AppCompatActivity
 
         m_context = this;
 
+        cityName = getStringFromSharedPreferences("cities", m_context);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -57,7 +67,7 @@ public class MyReservationsActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MyReservationsActivity.this, OfficesActivity.class);
-                intent.putExtra("cityName", cityName);
+                intent.putExtra("cityName", getStringFromSharedPreferences("cities", m_context));
                 startActivity(intent);
             }
         });
@@ -77,7 +87,7 @@ public class MyReservationsActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         getMyReservationsTask = getNewTask();
-        getMyReservationsTask.execute(URL);
+        getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
     }
 
     @Override
@@ -86,7 +96,7 @@ public class MyReservationsActivity extends AppCompatActivity
         AsyncTask.Status status = getMyReservationsTask.getStatus();
         if (status.name().equals("FINISHED")) {
             getMyReservationsTask = getNewTask();
-            getMyReservationsTask.execute(URL);
+            getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
         }
     }
 
@@ -96,6 +106,7 @@ public class MyReservationsActivity extends AppCompatActivity
             public void processFinish(ArrayList<Reservation> reservations) {
                 reservationsAdapter.setList(reservations);
                 lvReservations.setAdapter(reservationsAdapter);
+                //createNotificationForContact(reservations.get(0));
             }
         }, m_context);
 
@@ -153,18 +164,36 @@ public class MyReservationsActivity extends AppCompatActivity
     }
 
     private void logOut() {
-        removeSharedPreferences("userID");
+        removeSharedPreferences("userID", m_context);
 
         Intent intent = new Intent(MyReservationsActivity.this, AuthorizationActivity.class);
         startActivity(intent);
     }
 
-    private void removeSharedPreferences(String key) {
-        SharedPreferences sPref = getApplicationContext()
-                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+    public void createNotificationForContact(Reservation reservation) {
+        GregorianCalendar todayDate = getLocaleDate(reservation);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, todayDate.get(Calendar.YEAR));
+        calendar.set(Calendar.MONTH, todayDate.get(Calendar.MONTH));
+        Log.d("MONTH_CONTACT", String.valueOf(todayDate.get(Calendar.MONTH)));
+        calendar.set(Calendar.DAY_OF_MONTH, todayDate.get(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
 
-        SharedPreferences.Editor editor = sPref.edit();
-        editor.remove(key);
-        editor.commit();
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, TimeNotification.class);
+        intent.putExtra("name", "Hello world");
+        intent.putExtra("day", "Today");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0,
+                intent, PendingIntent.FLAG_CANCEL_CURRENT );
+        am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+    }
+
+    public GregorianCalendar getLocaleDate(Reservation reservation) {
+        GregorianCalendar gCal = new GregorianCalendar(reservation.getReservationYear(),
+                reservation.getReservationMonth(), reservation.getReservationDay());
+        return  gCal;
     }
 }
