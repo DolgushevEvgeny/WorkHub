@@ -1,9 +1,12 @@
 package com.example.eugenedolgushev.workhub.Activities;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -19,21 +22,30 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class AuthorizationActivity extends AppCompatActivity {
-    private EditText loginField, passwordField;
-    private Button loginButton;
+import static com.example.eugenedolgushev.workhub.Strings.LOGIN_URL;
+import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
+import static com.example.eugenedolgushev.workhub.Utils.setStringToSharedPreferences;
 
-    public static final String SHARED_PREFERENCES_NAME = "MyStorage";
-    private static final String URL = "http://192.168.0.32:3000/login";
+public class AuthorizationActivity extends AppCompatActivity {
+    private EditText loginField;
+    TextInputEditText passwordField;
+    private Button loginButton;
+    private Context m_context;
+
     private String userID = "";
+    private boolean hasCity = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authorization);
+        setTitle("Авторизация");
+
+        m_context = this;
 
         loginField = (EditText) findViewById(R.id.login_field);
-        passwordField = (EditText) findViewById(R.id.password_field);
+        passwordField = (TextInputEditText) findViewById(R.id.password_field);
         loginButton = (Button) findViewById(R.id.login_button);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -46,21 +58,34 @@ public class AuthorizationActivity extends AppCompatActivity {
             }
         });
 
-        getSharedPreferences();
+        getCity();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        getSharedPreferences();
+        loginField.setText("");
+        passwordField.setText("");
+
+        if (hasCity) {
+            getUserID();
+        }
     }
 
-    private void getSharedPreferences() {
-        SharedPreferences sPref = getApplicationContext()
-                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+    private void getCity() {
+        String city = getStringFromSharedPreferences("cities", m_context);
+        if (city.length() == 0) {
+            Intent intent = new Intent(AuthorizationActivity.this, ChangeCityActivity.class);
+            startActivityForResult(intent, 1);
+        } else {
+            hasCity = true;
+            getUserID();
+        }
+    }
 
-        String savedUserID = sPref.getString("userID", "");
+    private void getUserID() {
+        String savedUserID = getStringFromSharedPreferences("userID", m_context);
         if (savedUserID.length() != 0) {
             Intent intent = new Intent(AuthorizationActivity.this, MyReservationsActivity.class);
             intent.putExtra("userID", savedUserID);
@@ -69,18 +94,36 @@ public class AuthorizationActivity extends AppCompatActivity {
     }
 
     private void putSharedPreferences() {
-        SharedPreferences sPref = getApplicationContext()
-                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        setStringToSharedPreferences("userID", userID, m_context);
+        setStringToSharedPreferences("password", passwordField.getText().toString().trim(), m_context);
+    }
 
-        SharedPreferences.Editor editor = sPref.edit();
-        editor.putString("userID", userID);
-        editor.putString("password", passwordField.getText().toString().trim());
-        editor.commit();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1) {
+            if (resultCode == 0) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(m_context);
+                builder.setTitle("Ошибка")
+                    .setMessage("Нужно обязательно выбрать город")
+                    .setCancelable(false)
+                    .setPositiveButton("Продолжить", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(AuthorizationActivity.this, ChangeCityActivity.class);
+                            startActivityForResult(intent, 1);
+                        }
+                    });
+                AlertDialog alert = builder.create();
+                alert.show();
+            } else {
+                getCity();
+            }
+        }
     }
 
     class ParseData extends AsyncTask<String, Void, String> {
-
-        String resultJson = "";
 
         @Override
         protected void onPreExecute() {
@@ -89,9 +132,9 @@ public class AuthorizationActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            String param = "login=" + params[0] + "&password=" + params[1];
+            String resultJson = "", param = "login=" + params[0] + "&password=" + params[1];
             try {
-                URL requestUrl = new URL(URL + "/?" + param);
+                URL requestUrl = new URL(MAIN_URL + LOGIN_URL + "/?" + param);
 
                 HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
                 connection.setRequestMethod("GET");
@@ -138,7 +181,7 @@ public class AuthorizationActivity extends AppCompatActivity {
                 }
             } catch(NumberFormatException e) {
                 putSharedPreferences();
-                getSharedPreferences();
+                getUserID();
             }
 
         }
