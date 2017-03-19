@@ -29,6 +29,21 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/change_city_view"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:paddingStart="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Изменить город"
+                android:gravity="center|start"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>
