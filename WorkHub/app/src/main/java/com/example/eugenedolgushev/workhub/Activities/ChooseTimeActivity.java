@@ -3,7 +3,6 @@ package com.example.eugenedolgushev.workhub.Activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -36,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.example.eugenedolgushev.workhub.Activities.AuthorizationActivity.SHARED_PREFERENCES_NAME;
+import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 
 public class ChooseTimeActivity extends AppCompatActivity {
 
@@ -267,10 +266,7 @@ public class ChooseTimeActivity extends AppCompatActivity {
     }
 
     private String makeJson() {
-        SharedPreferences sPref = getApplicationContext()
-                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-
-        String savedUserID = sPref.getString("userID", "");
+        String savedUserID = getStringFromSharedPreferences("userID", m_context);
 
         return "{ \"office\" : \"" + officeName + "\", " +
                 "\"city\" : \"" + cityName + "\", " +

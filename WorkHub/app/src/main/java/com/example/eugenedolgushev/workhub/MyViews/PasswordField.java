@@ -1,7 +1,6 @@
 package com.example.eugenedolgushev.workhub.MyViews;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -9,8 +8,7 @@ import android.widget.TextView;
 
 import com.example.eugenedolgushev.workhub.R;
 
-import static android.content.Context.MODE_PRIVATE;
-import static com.example.eugenedolgushev.workhub.Activities.AuthorizationActivity.SHARED_PREFERENCES_NAME;
+import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 
 public class PasswordField extends android.support.v7.widget.AppCompatEditText {
 
@@ -47,7 +45,6 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
         m_newPasswordView = newPassword;
         m_confirmBtn = confirmBtn;
     }
-
 
     @Override
     protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
@@ -97,7 +94,7 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
     }
 
     private void validateCurrentPassword() {
-        String currentPassword = getPassword();
+        String currentPassword = getStringFromSharedPreferences("password", m_context);
         String inputCurrentPassword = this.getText().toString().trim();
         if (!currentPassword.equals(inputCurrentPassword)) {
             m_currentPasswordViewError.setVisibility(View.VISIBLE);
@@ -109,12 +106,5 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
 
     public boolean isValidated() {
         return m_isValidated;
-    }
-
-    private String getPassword() {
-        SharedPreferences sPref = m_context
-                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-
-        return sPref.getString("password", "");
     }
 }

@@ -2,10 +2,8 @@ package com.example.eugenedolgushev.workhub.AsyncTasks;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
-import com.example.eugenedolgushev.workhub.Activities.AuthorizationActivity;
 import com.example.eugenedolgushev.workhub.Plan;
 import com.example.eugenedolgushev.workhub.PlanList;
 import com.example.eugenedolgushev.workhub.Utils;
@@ -22,7 +20,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-import static android.content.Context.MODE_PRIVATE;
+import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 
 public class GetPlans extends AsyncTask<String, Void, String> {
 
@@ -52,10 +50,7 @@ public class GetPlans extends AsyncTask<String, Void, String> {
 
         }
 
-        SharedPreferences sPref = m_context
-                .getSharedPreferences(AuthorizationActivity.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-
-        String savedUserID = sPref.getString("userID", "");
+        String savedUserID = getStringFromSharedPreferences("userID", m_context);
 
         String requestParams = "userID=" + savedUserID + "&city=" + city + "&office=" + officeName;
         try {

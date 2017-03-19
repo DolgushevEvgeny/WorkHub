@@ -3,7 +3,6 @@ package com.example.eugenedolgushev.workhub.Activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,7 +27,6 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -39,7 +37,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.example.eugenedolgushev.workhub.Activities.AuthorizationActivity.SHARED_PREFERENCES_NAME;
+import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.Strings.REMOVE_RESERVATION_URL;
+import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 
 public class ChooseDaysActivity extends AppCompatActivity {
     private MaterialCalendarView calendarView = null;
@@ -49,7 +49,6 @@ public class ChooseDaysActivity extends AppCompatActivity {
     private RecyclerView listView = null;
     private MyAdapter myAdapter;
 
-    private static final String url = "http://192.168.0.32:3000/removeReservation";
     private String officeName = "", cityName = "", planName = "", officeAddress = "";
     private Integer planPrice = 0;
     private List<Reservation> reservations = new ArrayList<Reservation>();
@@ -258,12 +257,8 @@ public class ChooseDaysActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            HttpURLConnection connection = null;
-            InputStream is = null;
-            BufferedReader readerBuf = null;
 
-            String city = "", plan = "";
-            String date = params[0], startTime = params[1], duration = params[2];
+            String city = "", plan = "", date = params[0], startTime = params[1], duration = params[2];
             try {
                 city = URLEncoder.encode(cityName, "UTF-8");
                 plan = URLEncoder.encode(planName, "UTF-8");
@@ -271,27 +266,21 @@ public class ChooseDaysActivity extends AppCompatActivity {
 
             }
 
-            SharedPreferences sPref = getApplicationContext()
-                    .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-
-            String savedUserID = sPref.getString("userID", "");
-
+            String savedUserID = getStringFromSharedPreferences("userID", m_context);
             String requestParams = "city=" + city + "&office=" + officeName
                     + "&plan=" + plan + "&date=" + date + "&startTime=" + startTime
                     + "&duration=" + duration + "&userID=" + savedUserID;
             try {
-                URL requestUrl = new URL(url + "/?" + requestParams);
+                URL requestUrl = new URL(MAIN_URL + REMOVE_RESERVATION_URL + "/?" + requestParams);
 
-                connection = (HttpURLConnection) requestUrl.openConnection();
+                HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
                 connection.setRequestMethod("GET");
 
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    is = connection.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
-
-                    readerBuf = new BufferedReader(new InputStreamReader(is));
+                    BufferedReader readerBuf = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
                     String line = "";
+                    StringBuffer buffer = new StringBuffer();
                     while((line = readerBuf.readLine()) != null) {
                         buffer.append(line);
                     }
@@ -367,10 +356,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
     }
 
     private ArrayList<String> makeJson() {
-        SharedPreferences sPref = getApplicationContext()
-                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-
-        String savedUserID = sPref.getString("userID", "");
+        String savedUserID = getStringFromSharedPreferences("userID", m_context);
         ArrayList<String> resultReservations = new ArrayList<>();
         for (int i = 0; i < reservations.size(); ++i) {
             Reservation reservation = reservations.get(i);

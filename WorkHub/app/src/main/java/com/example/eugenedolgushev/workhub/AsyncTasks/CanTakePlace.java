@@ -15,10 +15,12 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
+import static com.example.eugenedolgushev.workhub.Strings.CAN_TAKE_PLACE_URL;
+import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
+
 public class CanTakePlace extends AsyncTask<String, Void, String> {
     private Context m_context;
     private AsyncResponse m_delegate;
-    private static final String URL = "http://192.168.0.32:3000/canTakePlace";
     private ArrayList<String> dates = new ArrayList<>();
     private ArrayList<Integer> times = new ArrayList<>();
     private String m_message = "";
@@ -47,7 +49,7 @@ public class CanTakePlace extends AsyncTask<String, Void, String> {
         }
 
         try {
-            URL requestUrl = new URL(URL + "/?" + "reservation=" + reservation);
+            URL requestUrl = new URL(MAIN_URL + CAN_TAKE_PLACE_URL + "/?" + "reservation=" + reservation);
 
             HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
             connection.setRequestMethod("GET");
@@ -118,7 +120,6 @@ public class CanTakePlace extends AsyncTask<String, Void, String> {
             }
             if (dataJsonObj.has("message")) {
                 m_message = dataJsonObj.getString("message");
-                //Utils.showAlertDialog(message, m_context);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -126,7 +127,7 @@ public class CanTakePlace extends AsyncTask<String, Void, String> {
     }
 
     private void sameReservation(JSONObject dataJsonObj) {
-        String date = "", message = "";
+        String date = "";
         Integer startTime = 0, duration = 0;
         try {
             if (dataJsonObj.has("date")) {
@@ -141,7 +142,6 @@ public class CanTakePlace extends AsyncTask<String, Void, String> {
             }
             if (dataJsonObj.has("message")) {
                 m_message = dataJsonObj.getString("message") + " : " + date + " с " + startTime + " до " + (startTime + duration);
-                //Utils.showAlertDialog(message, m_context);
             }
         } catch (JSONException e) {
             e.printStackTrace();
