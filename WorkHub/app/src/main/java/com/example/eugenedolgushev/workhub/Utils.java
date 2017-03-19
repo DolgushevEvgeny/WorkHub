@@ -3,7 +3,11 @@ package com.example.eugenedolgushev.workhub;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
+
+import static android.content.Context.MODE_PRIVATE;
+import static com.example.eugenedolgushev.workhub.Strings.SHARED_PREFERENCES_NAME;
 
 public class Utils {
 
@@ -29,5 +33,30 @@ public class Utils {
                 });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    public static void setStringToSharedPreferences(final String key, final String value, final Context context) {
+        SharedPreferences sPref = context
+                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sPref.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    public static String getStringFromSharedPreferences(final String key, final Context context) {
+        SharedPreferences sPref = context
+                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+
+        return sPref.getString(key, "");
+    }
+
+    public static void removeSharedPreferences(final String key, final Context context) {
+        SharedPreferences sPref = context
+                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sPref.edit();
+        editor.remove(key);
+        editor.commit();
     }
 }
