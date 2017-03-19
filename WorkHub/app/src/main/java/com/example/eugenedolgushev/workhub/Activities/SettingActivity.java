@@ -14,7 +14,7 @@ import com.example.eugenedolgushev.workhub.R;
 public class SettingActivity extends AppCompatActivity {
 
     private Context m_context;
-    private LinearLayout changePasswordView;
+    private LinearLayout changePasswordView, changeCityView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +32,15 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SettingActivity.this, ChangePasswordActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        changeCityView = (LinearLayout) findViewById(R.id.change_city_view);
+        changeCityView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingActivity.this, ChangeCityActivity.class);
                 startActivity(intent);
             }
         });
