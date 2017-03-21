@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -45,7 +46,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
     private MaterialCalendarView calendarView = null;
     private Button continueBtn = null, reservationListBtn = null, closeListBtn = null;
     private TextView daysCountView = null, totalSumView = null;
-    private LinearLayout reservationList = null;
+    private LinearLayout reservationList = null, mainLayout = null;
     private RecyclerView listView = null;
     private MyAdapter myAdapter;
 
@@ -59,6 +60,8 @@ public class ChooseDaysActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_days);
+        setTitle("Выберите дни");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         officeName = getIntent().getExtras().getString("officeName");
         cityName = getIntent().getExtras().getString("cityName");
@@ -149,6 +152,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
                 setElementsEnable(false);
                 myAdapter.setList((ArrayList) reservations);
                 reservationList.setVisibility(View.VISIBLE);
+                mainLayout.setVisibility(View.GONE);
             }
         });
 
@@ -158,6 +162,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
             public void onClick(View v) {
                 setElementsEnable(true);
                 reservationList.setVisibility(View.GONE);
+                mainLayout.setVisibility(View.VISIBLE);
             }
         });
 
@@ -174,8 +179,11 @@ public class ChooseDaysActivity extends AppCompatActivity {
         listView.setAdapter(myAdapter);
 
         reservationList = (LinearLayout) findViewById(R.id.reservation_list);
+        mainLayout = (LinearLayout) findViewById(R.id.main_layout);
         daysCountView = (TextView) findViewById(R.id.days_count);
         totalSumView = (TextView) findViewById(R.id.result_sum);
+
+        updateViews();
     }
 
 
@@ -198,6 +206,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
                 reservation.setReservationPlanName(planName);
                 reservation.setReservationSum(planPrice * duration);
                 reservation.setOfficeAddress(officeAddress);
+                reservation.setReservationStatus("Оплачено");
                 reservations.add(reservation);
 
                 updateViews();
@@ -322,7 +331,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
 
     private Boolean checkReservationsOnCollision() {
         sortReservations();
-        if (reservations.size() > 1) {
+        if (reservations.size() > 0) {
             for (int i = 0; i < reservations.size() - 1; ++i) {
                 Reservation first = reservations.get(i);
                 for (int j = i + 1; j < reservations.size(); ++j) {
@@ -337,6 +346,8 @@ public class ChooseDaysActivity extends AppCompatActivity {
                     }
                 }
             }
+        } else {
+            return false;
         }
 
         return true;
@@ -369,10 +380,22 @@ public class ChooseDaysActivity extends AppCompatActivity {
                     "\"startTime\" : " + reservation.getStartTime() + ", " +
                     "\"duration\" : " + reservation.getDuration() + ", " +
                     "\"planPrice\" : " + reservation.getReservationSum() / reservation.getDuration() + ", " +
+                    "\"status\" : \"" + reservation.getReservationStatus() + "\", " +
                     "\"userID\" : \"" + savedUserID + "\" }";
             resultReservations.add(object);
         }
 
         return resultReservations;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

@@ -46,7 +46,6 @@ public class OfficeList extends BaseAdapter {
         Office office = getOffice(position);
 
         // заполняем View в пункте списка данными
-        ((TextView) view.findViewById(R.id.city)).setText(office.getCityName());
         ((TextView) view.findViewById(R.id.office_name)).setText("\"" + office.getOfficeName() + "\"");
         ((TextView) view.findViewById(R.id.office_address)).setText(office.getOfficeAddress());
 

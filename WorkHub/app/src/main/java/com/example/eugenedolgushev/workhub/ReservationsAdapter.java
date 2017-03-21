@@ -36,7 +36,6 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
 
             m_reservationDateMoreView = (TextView) v.findViewById(R.id.reservation_date_more);
             m_reservationStartTimeMoreView = (TextView) v.findViewById(R.id.reservation_start_time_more);
-            m_reservationDurationMoreView = (TextView) v.findViewById(R.id.reservation_duration_more);
             m_reservationOfficeAddressMoreView = (TextView) v.findViewById(R.id.reservation_office_address_more);
             m_reservationStatusMoreView = (TextView) v.findViewById(R.id.reservation_status_more);
             m_lessInfoBtn = (Button) v.findViewById(R.id.reservation_less_info_button);
@@ -69,15 +68,11 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
     @Override
     public void onBindViewHolder(ReservationsAdapter.ViewHolder holder, int position) {
         holder.m_reservationDateView.setText(createDate(position));
-        //holder.m_reservationStartTimeView.setText(m_reservationList.get(position).getStartTime().toString());
-        //holder.m_reservationOfficeAddressView.setText(m_reservationList.get(position).getOfficeAddress());
 
         holder.m_reservationDateMoreView.setText(createDate(position));
         holder.m_reservationStartTimeMoreView.setText("Время посещения с " +
                 m_reservationList.get(position).getStartTime().toString() + " до " +
                 (m_reservationList.get(position).getStartTime() + m_reservationList.get(position).getDuration()));
-//        holder.m_reservationDurationMoreView.setText("Продолжительность " +
-//                m_reservationList.get(position).getDuration().toString() + " часа(ов)");
         holder.m_reservationOfficeAddressMoreView.setText("Офис " + m_reservationList.get(position).getOfficeName() + ",  " +
                 m_reservationList.get(position).getOfficeAddress());
         holder.m_reservationStatusMoreView.setText(m_reservationList.get(position).getReservationStatus());

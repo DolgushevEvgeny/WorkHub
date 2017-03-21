@@ -1,10 +1,11 @@
 package com.example.eugenedolgushev.workhub;
 
 import android.content.Context;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.example.eugenedolgushev.workhub.MyViews.MyEditText;
+
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
 
 public class MyFocusChange implements View.OnFocusChangeListener {
     Context m_context = null;
@@ -62,7 +63,7 @@ public class MyFocusChange implements View.OnFocusChangeListener {
     private void validateCardOwner(MyEditText editTextView, String value) {
         if (value.length() == 0) {
             editTextView.setBackgroundResource(R.drawable.edit_text_border);
-            showAlertDialog("Заполните поле владельца карты");
+            showAlertDialog("Заполните поле владельца карты", m_context);
         } else {
             editTextView.setValidation(true);
         }
@@ -72,18 +73,9 @@ public class MyFocusChange implements View.OnFocusChangeListener {
         String value = editTextView.getText().toString();
         if (value.length() != digits) {
             editTextView.setBackgroundResource(R.drawable.edit_text_border);
-            showAlertDialog("Введите " + digits + " числовых знака");
+            showAlertDialog("Введите " + digits + " числовых знака", m_context);
         } else {
             editTextView.setValidation(true);
         }
-    }
-
-    private void showAlertDialog(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(m_context);
-        builder.setTitle("Ошибка")
-                .setMessage(message)
-                .setCancelable(true);
-        AlertDialog alert = builder.create();
-        alert.show();
     }
 }

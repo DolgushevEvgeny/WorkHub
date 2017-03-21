@@ -115,6 +115,9 @@ public class GetMyReservations extends AsyncTask<String, Void, String> {
                 if (recordJsonObj.has("officeAddress")) {
                     reservation.setOfficeAddress(recordJsonObj.getString("officeAddress"));
                 }
+                if (recordJsonObj.has("status")) {
+                    reservation.setReservationStatus(recordJsonObj.getString("status"));
+                }
 
                 reservations.add(reservation);
             }

@@ -8,6 +8,7 @@ public class Strings {
     public static final String REMOVE_RESERVATION_URL = "removeReservation";
     public static final String CAN_TAKE_PLACE_URL = "canTakePlace";
     public static final String MY_RESERVATIONS_URL = "MyReservations";
+    public static final String CHANGE_PASSWORD_URL = "changePassword";
 
 
 }

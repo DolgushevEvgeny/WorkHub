@@ -44,8 +44,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(MyAdapter.ViewHolder holder, int position) {
         final int myPosition = position;
-        holder.mTextView1.setText(m_reservationList.get(position).getReservationDate());
-        holder.mTextView2.setText(m_reservationList.get(position).getDuration().toString());
+        holder.mTextView1.setText("Дата - " + m_reservationList.get(position).getReservationDate());
+        holder.mTextView2.setText("Время посещения с " + m_reservationList.get(position).getStartTime().toString()
+                + " до " + String.valueOf(m_reservationList.get(position).getStartTime() +
+                m_reservationList.get(position).getDuration()));
         holder.deleteItemBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

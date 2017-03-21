@@ -11,7 +11,7 @@ public class Reservation {
     private Integer m_reservationDay = 0;
     private Integer m_reservationMonth = 0;
     private Integer m_reservationYear = 0;
-    private String m_reservationStatus = "";
+    private String m_reservationStatus = "Не оплачено";
     private Boolean m_isPaid = false;
 
     public void setOfficeCity(String city) {

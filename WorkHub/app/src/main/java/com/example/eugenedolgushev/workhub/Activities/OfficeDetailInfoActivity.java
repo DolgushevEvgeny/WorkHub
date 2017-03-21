@@ -30,6 +30,7 @@ public class OfficeDetailInfoActivity extends FragmentActivity implements OnMapR
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_office_detail_info);
+        setTitle("Информация");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -42,7 +43,7 @@ public class OfficeDetailInfoActivity extends FragmentActivity implements OnMapR
         officeLongitude = getIntent().getExtras().getDouble("longitude");
 
         officeAddressView = (TextView) findViewById(R.id.office_info_address);
-        officeAddressView.setText(officeName + ", " + officeAddress);
+        officeAddressView.setText("Офис " + officeName + ", " + officeAddress);
 
         nextBtn = (Button) findViewById(R.id.office_info_next_button);
         nextBtn.setOnClickListener(new View.OnClickListener() {

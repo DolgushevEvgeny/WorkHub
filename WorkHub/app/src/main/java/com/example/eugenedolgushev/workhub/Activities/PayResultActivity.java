@@ -15,6 +15,7 @@ public class PayResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay_result);
+        setTitle("Оплачено");
 
         finalBtn = (Button) findViewById(R.id.final_button);
         finalBtn.setOnClickListener(new View.OnClickListener() {
@@ -24,5 +25,12 @@ public class PayResultActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(PayResultActivity.this, MyReservationsActivity.class);
+        startActivity(intent);
     }
 }
