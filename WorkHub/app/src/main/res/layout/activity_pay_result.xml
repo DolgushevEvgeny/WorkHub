@@ -18,19 +18,25 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:text="Оплата произведена успешно"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textSize="26sp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
             android:text="Спасибо за пользование нашим сервисом"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textSize="17sp"/>
 
         <Button
             android:id="@+id/final_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/white"
             android:text="Завершить"/>
     </LinearLayout>
 </RelativeLayout>

@@ -9,67 +9,86 @@
     android:weightSum="1">
 
     <LinearLayout
-        android:id="@+id/info"
+        android:id="@+id/main_layout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:weightSum="1.0">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
+            android:id="@+id/info"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.8">
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:weightSum="1.0">
 
-            <TextView
-                android:id="@+id/days_count"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Вы выбрали: "
-                android:textSize="16dp"/>
+                android:layout_weight="0.8">
 
-            <TextView
-                android:id="@+id/result_sum"
-                android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/days_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Вы выбрали: "
+                    android:textSize="16dp"/>
+
+                <TextView
+                    android:id="@+id/result_sum"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Сумма: "
+                    android:textSize="16dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Сумма: "
-                android:textSize="16dp"/>
+                android:layout_weight="0.2"
+                android:gravity="end">
+
+                <Button
+                    android:id="@+id/list_button"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@android:drawable/ic_menu_edit"/>
+            </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_below="@+id/info"
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:gravity="end">
+            app:mcv_showOtherDates="all"
+            app:mcv_selectionColor="@color/green"
+            />
+
+        <LinearLayout
+            android:layout_below="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:gravity="center">
 
             <Button
-                android:id="@+id/list_button"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@android:drawable/ic_menu_edit"/>
+                android:id="@+id/next"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:textColor="@color/white"
+                android:text="Продолжить"/>
+
         </LinearLayout>
+
     </LinearLayout>
-
-    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_below="@+id/info"
-        android:id="@+id/calendarView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:mcv_showOtherDates="all"
-        app:mcv_selectionColor="@color/green"
-        />
-
-    <Button
-        android:layout_below="@+id/calendarView"
-        android:id="@+id/next"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Продолжить"/>
 
     <include
         layout="@layout/chosen_reservation_list"

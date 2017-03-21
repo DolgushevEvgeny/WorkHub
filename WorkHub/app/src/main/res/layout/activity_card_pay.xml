@@ -14,11 +14,13 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:orientation="vertical"
         tools:context="com.example.eugenedolgushev.workhub.Activities.CardPayActivity"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:focusableInTouchMode="true">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="18sp"
             android:text="Номер карты"/>
 
         <LinearLayout
@@ -71,7 +73,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Срок действия карты"/>
+            android:text="Срок действия карты"
+            android:textSize="18sp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -102,7 +105,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Владелец карты"/>
+            android:text="Владелец карты"
+            android:textSize="18sp"/>
 
         <com.example.eugenedolgushev.workhub.MyViews.MyEditText
             android:id="@+id/card_owner"
@@ -115,7 +119,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Код безопасности ( CVC/CW2)"/>
+            android:text="Код безопасности ( CVC/CW2)"
+            android:textSize="18sp"/>
 
         <com.example.eugenedolgushev.workhub.MyViews.MyEditText
             android:id="@+id/card_safe_code"
@@ -130,6 +135,8 @@
             android:id="@+id/pay_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:background="@color/colorPrimary"
             android:text="Оплатить"/>
     </LinearLayout>
 
