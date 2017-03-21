@@ -6,13 +6,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.example.eugenedolgushev.workhub.AsyncTasks.CanTakePlace;
-import com.example.eugenedolgushev.workhub.MyViews.MyEditText;
 import com.example.eugenedolgushev.workhub.MyFocusChange;
+import com.example.eugenedolgushev.workhub.MyViews.MyEditText;
 import com.example.eugenedolgushev.workhub.R;
 import com.example.eugenedolgushev.workhub.Utils;
 
@@ -42,6 +43,8 @@ public class CardPayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_pay);
+        setTitle("Оплата картой");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         m_context = this;
 
@@ -137,19 +140,17 @@ public class CardPayActivity extends AppCompatActivity {
 
     private Boolean checkAllFields(MyEditText... fields) {
         for (MyEditText view : fields) {
-            view.setFocusable(false);
+            view.clearFocus();
             if (!view.getValidation()) {
+                view.setBackgroundResource(R.drawable.edit_text_border);
                 AlertDialog.Builder builder = new AlertDialog.Builder(CardPayActivity.this);
                 builder.setTitle("Ошибка")
                     .setMessage("Заполните выделенное поле")
                     .setCancelable(true);
                 AlertDialog alert = builder.create();
                 alert.show();
-                view.setFocusable(true);
-                view.setBackgroundResource(R.drawable.edit_text_border);
                 return false;
             }
-            view.setFocusable(true);
         }
         return true;
     }
@@ -212,6 +213,17 @@ public class CardPayActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String strJson) {
             super.onPostExecute(strJson);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
