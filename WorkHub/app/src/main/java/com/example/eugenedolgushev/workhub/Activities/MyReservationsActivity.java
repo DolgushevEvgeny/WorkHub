@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.eugenedolgushev.workhub.AsyncTasks.GetMyReservations;
 import com.example.eugenedolgushev.workhub.R;
@@ -41,9 +42,9 @@ public class MyReservationsActivity extends AppCompatActivity
 
     private Context m_context = null;
     private FloatingActionButton addReservationBtn = null;
+    private TextView userName, userSurname;
 
     private String cityName;
-    //private static final String URL = "http://192.168.0.32:3000/MyReservations";
     private RecyclerView lvReservations = null;
     private ReservationsAdapter reservationsAdapter;
     private List<Reservation> reservations = new ArrayList<Reservation>();
@@ -85,6 +86,14 @@ public class MyReservationsActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View headerView = navigationView.getHeaderView(0);
+
+        userName = (TextView) headerView.findViewById(R.id.user_name_view);
+        userName.setText(getStringFromSharedPreferences("userName", m_context));
+
+        userSurname = (TextView) headerView.findViewById(R.id.user_surname_view);
+        userSurname.setText(getStringFromSharedPreferences("userSurname", m_context));
 
         getMyReservationsTask = getNewTask();
         getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
