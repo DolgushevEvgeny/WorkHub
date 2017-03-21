@@ -125,12 +125,14 @@ app.get('/login', function(request, response) {
         if (!err) {
           if (record) {
             console.log(record);
-            answer.id = record._id;
+            answer.code = 1;
+            answer.user = record;
             db.close();
             sendResponse(answer, response);
           } else {
             console.log('Записи нет');
-            answer.id = -1;
+            answer.code = 0;
+            answer.message = 'Неверный логин или пароль';
             db.close();
             sendResponse(answer, response);
           }
@@ -301,11 +303,42 @@ app.get('/setReservation', function(request, response) {
       var reservationsCollection = db.collection('reservations');
       setReservation(reservationsCollection, reservation.city, reservation.office,
         reservation.plan, reservation.date, reservation.startTime, reservation.duration,
-        reservation.planPrice, reservation.officeAddress, reservation.userID);
+        reservation.planPrice, reservation.officeAddress, reservation.status, reservation.userID);
       sendEmail();
     }
     db.close();
     sendResponse(answer, response);
+  });
+});
+
+app.get('/changePassword', function(request, response) {
+  console.log("Request get /changePassword received.");
+
+  var userID = request.query.userID;
+  var newPassword = request.query.password;
+  console.log(userID);
+  console.log(newPassword);
+
+  var answer = {};
+  MongoClient.connect("mongodb://localhost:27017/workhubDB", function(err, db) {
+    if (!err) {
+      var usersCollection = db.collection('users');
+      usersCollection.findOne({'_id': ObjectId(userID)}, function(err, record) {
+        if (record) {
+          console.log(record);
+          usersCollection.update({'_id': ObjectId(userID)}, {$set: {'password': newPassword}});
+          answer.code = 1;
+          answer.message = 'Пароль обновлен.'
+          db.close();
+          sendResponse(answer, response);
+        } else {
+          answer.code = 0;
+          answer.message = 'Такого пользователя не существует.';
+          db.close();
+          sendResponse(answer, response);
+        }
+      });
+    }
   });
 });
 
@@ -425,12 +458,12 @@ function removeReserve(list, hour) {
   }
 }
 
-function setReservation(collection, cityName, officeName, planName, date, startTime, duration, planPrice, officeAddress, userID) {
-  var record = setReservationFields(cityName, officeName, planName, date, startTime, duration, planPrice, officeAddress, userID);
+function setReservation(collection, cityName, officeName, planName, date, startTime, duration, planPrice, officeAddress, status, userID) {
+  var record = setReservationFields(cityName, officeName, planName, date, startTime, duration, planPrice, officeAddress, status, userID);
   collection.insertOne(record);
 }
 
-function setReservationFields(cityName, officeName, planName, date, startTime, duration, planPrice, officeAddress, userID) {
+function setReservationFields(cityName, officeName, planName, date, startTime, duration, planPrice, officeAddress, status, userID) {
   var reservation = {};
   reservation.city = cityName;
   reservation.office = officeName;
@@ -441,6 +474,7 @@ function setReservationFields(cityName, officeName, planName, date, startTime, d
   reservation.planPrice = planPrice;
   reservation.userID = userID;
   reservation.officeAddress = officeAddress;
+  reservation.status = status;
   return reservation;
 }
 
