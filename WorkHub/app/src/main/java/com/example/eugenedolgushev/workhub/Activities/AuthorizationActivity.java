@@ -26,6 +26,7 @@ import static com.example.eugenedolgushev.workhub.Strings.LOGIN_URL;
 import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.setStringToSharedPreferences;
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
 
 public class AuthorizationActivity extends AppCompatActivity {
     private EditText loginField;
@@ -33,7 +34,7 @@ public class AuthorizationActivity extends AppCompatActivity {
     private Button loginButton;
     private Context m_context;
 
-    private String userID = "";
+    private String userID = "", userName = "", userSurname = "";
     private boolean hasCity = false;
 
     @Override
@@ -163,12 +164,23 @@ public class AuthorizationActivity extends AppCompatActivity {
             super.onPostExecute(strJson);
 
             JSONObject dataJsonObj = null;
+            Integer code = 0;
+            String message = "";
             try {
                 dataJsonObj = new JSONObject(strJson);
-                if (dataJsonObj.has("id")) {
-                    userID = dataJsonObj.getString("id");
-                } else {
-                    return;
+                if (dataJsonObj.has("code")) {
+                    code = dataJsonObj.getInt("code");
+                }
+
+                switch (code) {
+                    case 0:
+                        userID = String.valueOf(-1);
+                        message = dataJsonObj.getString("message");
+                        showAlertDialog(message, m_context);
+                        break;
+                    case 1:
+                        userReceived(dataJsonObj.getJSONObject("user"));
+                        break;
                 }
 
             } catch(JSONException e) {
@@ -176,14 +188,29 @@ public class AuthorizationActivity extends AppCompatActivity {
             }
 
             try {
-                if (Integer.parseInt(userID) == -1) {
-
-                }
+                Integer.parseInt(userID);
             } catch(NumberFormatException e) {
                 putSharedPreferences();
                 getUserID();
             }
+        }
 
+        private void userReceived(JSONObject jsonObject) {
+            try {
+                if (jsonObject.has("_id")) {
+                    userID = jsonObject.getString("_id");
+                }
+                if (jsonObject.has("userName")) {
+                    userName = jsonObject.getString("userName");
+                    setStringToSharedPreferences("userName", userName, m_context);
+                }
+                if (jsonObject.has("userSurname")) {
+                    userSurname = jsonObject.getString("userSurname");
+                    setStringToSharedPreferences("userSurname", userSurname, m_context);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
