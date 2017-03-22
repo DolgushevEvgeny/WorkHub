@@ -15,8 +15,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-import static com.example.eugenedolgushev.workhub.Strings.CAN_TAKE_PLACE_URL;
-import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.CAN_TAKE_PLACE_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
 
 public class CanTakePlace extends AsyncTask<String, Void, String> {
     private Context m_context;

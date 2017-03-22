@@ -38,8 +38,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
-import static com.example.eugenedolgushev.workhub.Strings.REMOVE_RESERVATION_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.REMOVE_RESERVATION_URL;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 
 public class ChooseDaysActivity extends AppCompatActivity {

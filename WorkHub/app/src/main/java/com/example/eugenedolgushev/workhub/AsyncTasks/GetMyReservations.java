@@ -17,7 +17,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.eugenedolgushev.workhub.Strings.SHARED_PREFERENCES_NAME;
+import static com.example.eugenedolgushev.workhub.DefaultValues.SHARED_PREFERENCES_NAME;
 
 public class GetMyReservations extends AsyncTask<String, Void, String> {
 

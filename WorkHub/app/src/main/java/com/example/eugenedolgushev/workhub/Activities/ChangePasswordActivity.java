@@ -22,8 +22,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import static com.example.eugenedolgushev.workhub.Strings.CHANGE_PASSWORD_URL;
-import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.CHANGE_PASSWORD_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
 

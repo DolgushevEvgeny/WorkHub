@@ -22,8 +22,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static com.example.eugenedolgushev.workhub.Strings.LOGIN_URL;
-import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.LOGIN_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.setStringToSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;

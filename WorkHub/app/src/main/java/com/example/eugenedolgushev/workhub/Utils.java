@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.eugenedolgushev.workhub.Strings.SHARED_PREFERENCES_NAME;
+import static com.example.eugenedolgushev.workhub.DefaultValues.SHARED_PREFERENCES_NAME;
 
 public class Utils {
 
