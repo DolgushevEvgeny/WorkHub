@@ -32,13 +32,17 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import static com.example.eugenedolgushev.workhub.Strings.MAIN_URL;
-import static com.example.eugenedolgushev.workhub.Strings.MY_RESERVATIONS_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.MY_RESERVATIONS_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.NOTIFICATION_DELAY;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.removeSharedPreferences;
 
 public class MyReservationsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    // Идентификатор уведомления
+    private static final int NOTIFY_ID = 101;
 
     private Context m_context = null;
     private FloatingActionButton addReservationBtn = null;
@@ -115,7 +119,7 @@ public class MyReservationsActivity extends AppCompatActivity
             public void processFinish(ArrayList<Reservation> reservations) {
                 reservationsAdapter.setList(reservations);
                 lvReservations.setAdapter(reservationsAdapter);
-                //createNotificationForContact(reservations.get(0));
+                createNotificationForContact(reservations.get(0));
             }
         }, m_context);
 
@@ -183,21 +187,24 @@ public class MyReservationsActivity extends AppCompatActivity
         GregorianCalendar todayDate = getLocaleDate(reservation);
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, todayDate.get(Calendar.YEAR));
-        calendar.set(Calendar.MONTH, todayDate.get(Calendar.MONTH));
+        calendar.set(Calendar.MONTH, todayDate.get(Calendar.MONTH) - 1);
         Log.d("MONTH_CONTACT", String.valueOf(todayDate.get(Calendar.MONTH)));
         calendar.set(Calendar.DAY_OF_MONTH, todayDate.get(Calendar.DAY_OF_MONTH));
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.HOUR_OF_DAY, reservation.getStartTime() - NOTIFICATION_DELAY);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
-        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, TimeNotification.class);
-        intent.putExtra("name", "Hello world");
-        intent.putExtra("day", "Today");
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(m_context, TimeNotification.class);
+        intent.putExtra("date", reservation.getReservationDate());
+        intent.putExtra("officeName", reservation.getOfficeName());
+        intent.putExtra("officeAddress", reservation.getOfficeAddress());
+        intent.putExtra("startTime", reservation.getStartTime());
+        intent.putExtra("duration", reservation.getDuration());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0,
                 intent, PendingIntent.FLAG_CANCEL_CURRENT );
-        am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
     public GregorianCalendar getLocaleDate(Reservation reservation) {

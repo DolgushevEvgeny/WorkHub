@@ -66,6 +66,8 @@
             android:name=".Activities.ChangeCityActivity"
             android:label="@string/title_activity_change_city"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <receiver android:name=".TimeNotification" />
     </application>
 
 </manifest>
