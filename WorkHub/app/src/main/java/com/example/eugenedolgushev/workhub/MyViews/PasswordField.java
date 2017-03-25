@@ -15,7 +15,7 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
     private Context m_context;
     private int m_viewID;
     private boolean m_isValidated;
-    private PasswordField m_newPasswordView, m_repeatPasswordView;
+    private PasswordField m_currentPasswordView, m_newPasswordView, m_repeatPasswordView;
     private TextView m_currentPasswordViewError, m_newPasswordViewError, m_repeatPasswordViewError;
     private Button m_confirmBtn;
 
@@ -27,34 +27,6 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
 
     public void setViewID(int ID) {
         m_viewID = ID;
-    }
-
-    public void addLinks(TextView view, Button confirmBtn) {
-        switch (m_viewID) {
-            case R.id.current_password_view:
-                m_currentPasswordViewError = view;
-                m_confirmBtn = confirmBtn;
-                break;
-            case R.id.new_password_view:
-                m_newPasswordViewError = view;
-                m_confirmBtn = confirmBtn;
-                break;
-        }
-    }
-
-    public void addLinks(TextView view, PasswordField newPassword, Button confirmBtn) {
-        switch (m_viewID) {
-            case R.id.new_password_view:
-                m_newPasswordViewError = view;
-                m_repeatPasswordView = newPassword;
-                break;
-            case R.id.repeat_password_view:
-                m_repeatPasswordViewError = view;
-                m_newPasswordView = newPassword;
-                break;
-        }
-
-        m_confirmBtn = confirmBtn;
     }
 
     @Override
@@ -82,7 +54,9 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
         } else {
             m_currentPasswordViewError.setVisibility(View.GONE);
             m_isValidated = true;
-            setConfirmButtonEnable(true);
+            if (m_newPasswordView.isValidated() && m_repeatPasswordView.isValidated()) {
+                setConfirmButtonEnable(true);
+            }
         }
     }
 
@@ -103,7 +77,9 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
         } else {
             m_newPasswordViewError.setVisibility(View.GONE);
             m_isValidated = true;
-            setConfirmButtonEnable(true);
+            if (m_currentPasswordView.isValidated() && m_repeatPasswordView.isValidated()) {
+                setConfirmButtonEnable(true);
+            }
         }
     }
 
@@ -124,7 +100,10 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
         } else {
             m_repeatPasswordViewError.setVisibility(View.GONE);
             m_isValidated = true;
-            setConfirmButtonEnable(true);
+            validateNewPassword();
+            if (m_currentPasswordView.isValidated() && m_newPasswordView.isValidated()) {
+                setConfirmButtonEnable(true);
+            }
         }
     }
 
@@ -135,5 +114,37 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
         } else {
             m_confirmBtn.setBackgroundColor(getResources().getColor(R.color.blocker));
         }
+    }
+
+    public void setCurrentPasswordField(PasswordField currentPasswordView) {
+        m_currentPasswordView = currentPasswordView;
+    }
+
+    public void setNewPasswordField(PasswordField newPasswordView) {
+        m_newPasswordView = newPasswordView;
+    }
+
+    public void setRepeatedPasswordField(PasswordField repeatedPasswordView) {
+        m_repeatPasswordView = repeatedPasswordView;
+    }
+
+    public void setCurrentPasswordFieldError(TextView currentPasswordViewError) {
+        m_currentPasswordViewError = currentPasswordViewError;
+    }
+
+    public void setNewPasswordFieldError(TextView newPasswordViewError) {
+        m_newPasswordViewError = newPasswordViewError;
+    }
+
+    public void setRepeatedPasswordFieldError(TextView repeatedPasswordViewError) {
+        m_repeatPasswordViewError = repeatedPasswordViewError;
+    }
+
+    public void setConfirmButton(Button confirmBtn) {
+        m_confirmBtn = confirmBtn;
+    }
+
+    public boolean isValidated() {
+        return m_isValidated;
     }
 }

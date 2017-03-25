@@ -51,17 +51,28 @@ public class ChangePasswordActivity extends AppCompatActivity {
         });
 
         currentPasswordView = (PasswordField) findViewById(R.id.current_password_view);
-        currentPasswordView.setViewID(R.id.current_password_view);
         newPasswordView = (PasswordField) findViewById(R.id.new_password_view);
-        newPasswordView.setViewID(R.id.new_password_view);
         repeatPasswordView = (PasswordField) findViewById(R.id.repeat_password_view);
-        repeatPasswordView.setViewID(R.id.repeat_password_view);
 
-        currentPasswordView.addLinks((TextView) findViewById(R.id.current_password_view_error), confirmPasswordBtn);
-        newPasswordView.addLinks((TextView) findViewById(R.id.new_password_view_error),
-                repeatPasswordView, confirmPasswordBtn);
-        repeatPasswordView.addLinks((TextView) findViewById(R.id.repeat_password_view_error),
-                newPasswordView, confirmPasswordBtn);
+        currentPasswordView.setViewID(R.id.current_password_view);
+        currentPasswordView.setCurrentPasswordFieldError((TextView) findViewById(R.id.current_password_view_error));
+        currentPasswordView.setNewPasswordField(newPasswordView);
+        currentPasswordView.setRepeatedPasswordField(repeatPasswordView);
+        currentPasswordView.setConfirmButton(confirmPasswordBtn);
+
+        newPasswordView.setViewID(R.id.new_password_view);
+        newPasswordView.setNewPasswordFieldError((TextView) findViewById(R.id.new_password_view_error));
+        newPasswordView.setRepeatedPasswordField(repeatPasswordView);
+        newPasswordView.setCurrentPasswordField(currentPasswordView);
+        newPasswordView.setConfirmButton(confirmPasswordBtn);
+
+        repeatPasswordView.setViewID(R.id.repeat_password_view);
+        repeatPasswordView.setRepeatedPasswordFieldError((TextView) findViewById(R.id.repeat_password_view_error));
+        repeatPasswordView.setRepeatedPasswordField(repeatPasswordView);
+        repeatPasswordView.setNewPasswordFieldError((TextView) findViewById(R.id.new_password_view_error));
+        repeatPasswordView.setNewPasswordField(newPasswordView);
+        repeatPasswordView.setCurrentPasswordField(currentPasswordView);
+        repeatPasswordView.setConfirmButton(confirmPasswordBtn);
     }
 
     @Override
