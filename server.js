@@ -342,6 +342,15 @@ app.get('/changePassword', function(request, response) {
   });
 });
 
+app.get('/getCities', function(request, response) {
+  console.log("Request get /getCities received.");
+
+  var cities = ["Йошкар-Ола", "Казань", "Самара", "Нижний-Новгород"];
+  var answer = {};
+  answer.cities = cities;
+  sendResponse(answer, response);
+});
+
 function fillPlaceTimeArray(records) {
   var list = [];
   for (var i = 0; i < records.length; ++i) {
