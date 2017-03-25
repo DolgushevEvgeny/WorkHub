@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,13 +16,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.example.eugenedolgushev.workhub.AsyncTasks.GetMyReservations;
+import com.example.eugenedolgushev.workhub.DBManager;
 import com.example.eugenedolgushev.workhub.R;
 import com.example.eugenedolgushev.workhub.Reservation;
 import com.example.eugenedolgushev.workhub.ReservationsAdapter;
@@ -35,8 +36,11 @@ import java.util.List;
 import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
 import static com.example.eugenedolgushev.workhub.DefaultValues.MY_RESERVATIONS_URL;
 import static com.example.eugenedolgushev.workhub.DefaultValues.NOTIFICATION_DELAY;
+import static com.example.eugenedolgushev.workhub.Utils.compareDates;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
+import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
 import static com.example.eugenedolgushev.workhub.Utils.removeSharedPreferences;
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
 
 public class MyReservationsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -53,6 +57,9 @@ public class MyReservationsActivity extends AppCompatActivity
     private ReservationsAdapter reservationsAdapter;
     private List<Reservation> reservations = new ArrayList<Reservation>();
     private GetMyReservations getMyReservationsTask;
+
+    private DBManager dbManager;
+    private SQLiteDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +78,13 @@ public class MyReservationsActivity extends AppCompatActivity
         addReservationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MyReservationsActivity.this, OfficesActivity.class);
-                intent.putExtra("cityName", getStringFromSharedPreferences("cities", m_context));
-                startActivity(intent);
+                if (hasConnection(m_context)) {
+                    Intent intent = new Intent(MyReservationsActivity.this, OfficesActivity.class);
+                    intent.putExtra("cityName", getStringFromSharedPreferences("cities", m_context));
+                    startActivity(intent);
+                } else {
+                    showAlertDialog("Нет подключения к интернету", m_context);
+                }
             }
         });
 
@@ -99,17 +110,28 @@ public class MyReservationsActivity extends AppCompatActivity
         userSurname = (TextView) headerView.findViewById(R.id.user_surname_view);
         userSurname.setText(getStringFromSharedPreferences("userSurname", m_context));
 
-        getMyReservationsTask = getNewTask();
-        getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
+        if (hasConnection(m_context)) {
+            getMyReservationsTask = getNewTask();
+            getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
+        } else {
+            showAlertDialog("Нет подключения к интернету", m_context);
+        }
+
+        dbManager = new DBManager(this);
+        database = null;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        AsyncTask.Status status = getMyReservationsTask.getStatus();
-        if (status.name().equals("FINISHED")) {
-            getMyReservationsTask = getNewTask();
-            getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
+        if (hasConnection(m_context)) {
+            AsyncTask.Status status = getMyReservationsTask.getStatus();
+            if (status.name().equals("FINISHED")) {
+                getMyReservationsTask = getNewTask();
+                getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
+            }
+        } else {
+            showAlertDialog("Нет подключения к интернету", m_context);
         }
     }
 
@@ -119,7 +141,7 @@ public class MyReservationsActivity extends AppCompatActivity
             public void processFinish(ArrayList<Reservation> reservations) {
                 reservationsAdapter.setList(reservations);
                 lvReservations.setAdapter(reservationsAdapter);
-                createNotificationForContact(reservations.get(0));
+                checkForUpdates(reservations);
             }
         }, m_context);
 
@@ -183,12 +205,24 @@ public class MyReservationsActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    public void createNotificationForContact(Reservation reservation) {
+    private void checkForUpdates(ArrayList<Reservation> reservations) {
+        Calendar calendar = Calendar.getInstance();
+        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+        int currentYear = calendar.get(Calendar.YEAR);
+
+        for (int i = 0; i < reservations.size(); ++i) {
+            if (compareDates(currentDay, currentMonth, currentYear, reservations.get(i).getReservationDate())) {
+                createNotificationForContact(reservations.get(i));
+            }
+        }
+    }
+
+    public void createNotificationForContact(final Reservation reservation) {
         GregorianCalendar todayDate = getLocaleDate(reservation);
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, todayDate.get(Calendar.YEAR));
         calendar.set(Calendar.MONTH, todayDate.get(Calendar.MONTH) - 1);
-        Log.d("MONTH_CONTACT", String.valueOf(todayDate.get(Calendar.MONTH)));
         calendar.set(Calendar.DAY_OF_MONTH, todayDate.get(Calendar.DAY_OF_MONTH));
         calendar.set(Calendar.HOUR_OF_DAY, reservation.getStartTime() - NOTIFICATION_DELAY);
         calendar.set(Calendar.MINUTE, 0);
@@ -207,9 +241,8 @@ public class MyReservationsActivity extends AppCompatActivity
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
-    public GregorianCalendar getLocaleDate(Reservation reservation) {
-        GregorianCalendar gCal = new GregorianCalendar(reservation.getReservationYear(),
+    public static GregorianCalendar getLocaleDate(final Reservation reservation) {
+        return new GregorianCalendar(reservation.getReservationYear(),
                 reservation.getReservationMonth(), reservation.getReservationDay());
-        return  gCal;
     }
 }

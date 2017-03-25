@@ -11,6 +11,9 @@ import android.widget.LinearLayout;
 
 import com.example.eugenedolgushev.workhub.R;
 
+import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
+
 public class SettingActivity extends AppCompatActivity {
 
     private Context m_context;
@@ -31,8 +34,12 @@ public class SettingActivity extends AppCompatActivity {
         changePasswordView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SettingActivity.this, ChangePasswordActivity.class);
-                startActivity(intent);
+                if (hasConnection(m_context)) {
+                    Intent intent = new Intent(SettingActivity.this, ChangePasswordActivity.class);
+                    startActivity(intent);
+                } else {
+                    showAlertDialog("Нет подключения к интернету", m_context);
+                }
             }
         });
 
@@ -40,8 +47,12 @@ public class SettingActivity extends AppCompatActivity {
         changeCityView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SettingActivity.this, ChangeCityActivity.class);
-                startActivity(intent);
+                if (hasConnection(m_context)) {
+                    Intent intent = new Intent(SettingActivity.this, ChangeCityActivity.class);
+                    startActivity(intent);
+                } else {
+                    showAlertDialog("Нет подключения к интернету", m_context);
+                }
             }
         });
     }
