@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -58,5 +60,35 @@ public class Utils {
         SharedPreferences.Editor editor = sPref.edit();
         editor.remove(key);
         editor.commit();
+    }
+
+    public static boolean compareDates(final int curDay, final int curMonth, final int curYear, final String resDate) {
+        String[] values = resDate.split("\\.");
+        if (Integer.parseInt(values[2]) > curYear) {
+            return true;
+        } else if (Integer.parseInt(values[1]) > curMonth) {
+            return true;
+        } else if (Integer.parseInt(values[0]) >= curDay){
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean hasConnection(final Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            return true;
+        }
+        wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            return true;
+        }
+        wifiInfo = cm.getActiveNetworkInfo();
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            return true;
+        }
+        return false;
     }
 }
