@@ -138,7 +138,19 @@ public class GetOffices extends AsyncTask<String, Void, String> {
                     office.setLatitude(location.getDouble(0));
                     office.setLongitude(location.getDouble(1));
                 }
-
+                if (recordJsonObj.has("workList")) {
+                    JSONArray jsonWorkTimeList = recordJsonObj.getJSONArray("workList");
+                    ArrayList<ArrayList<Integer>> workTimeList = new ArrayList<>();
+                    for (int j = 0; j < jsonWorkTimeList.length(); ++j) {
+                        JSONArray item = jsonWorkTimeList.getJSONArray(j);
+                        ArrayList<Integer> workTimeItem = new ArrayList<>();
+                        for (int k = 0; k < item.length(); ++k) {
+                            workTimeItem.add(item.getInt(k));
+                        }
+                        workTimeList.add(workTimeItem);
+                    }
+                    office.setWorkTimeList(workTimeList);
+                }
                 offices.add(office);
             }
 
