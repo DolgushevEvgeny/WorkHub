@@ -46,6 +46,7 @@ public class OfficesActivity extends AppCompatActivity {
                 intent.putExtra("officeAddress", office.getOfficeAddress());
                 intent.putExtra("latitude", office.getLatitude());
                 intent.putExtra("longitude", office.getLongitude());
+                intent.putExtra("office", office);
                 startActivity(intent);
             }
         });

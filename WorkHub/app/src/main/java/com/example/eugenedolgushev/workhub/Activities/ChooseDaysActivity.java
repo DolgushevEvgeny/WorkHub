@@ -41,6 +41,7 @@ import java.util.List;
 import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
 import static com.example.eugenedolgushev.workhub.DefaultValues.REMOVE_RESERVATION_URL;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
+import static com.example.eugenedolgushev.workhub.Utils.dayOfWeek;
 
 public class ChooseDaysActivity extends AppCompatActivity {
     private MaterialCalendarView calendarView = null;
@@ -112,11 +113,7 @@ public class ChooseDaysActivity extends AppCompatActivity {
                         .setPositiveButton("Продолжить",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    Intent intent = new Intent(ChooseDaysActivity.this, OrderInfoActivity.class);
-                                    intent.putExtra("planName", planName);
-                                    intent.putExtra("planPrice", planPrice);
-                                    intent.putExtra("duration", reservations.size());
-                                    intent.putExtra("totalSum", calculateTotalSum());
+                                    Intent intent = new Intent(ChooseDaysActivity.this, CardPayActivity.class);
                                     intent.putStringArrayListExtra("reservations", makeJson());
                                     dialog.cancel();
                                     startActivityForResult(intent, 1);
@@ -130,14 +127,14 @@ public class ChooseDaysActivity extends AppCompatActivity {
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDaysActivity.this);
                         builder.setTitle("Важное сообщение!")
-                                .setMessage("Есть совпадения в бронировании")
-                                .setCancelable(false)
-                                .setPositiveButton("Буду исправлять",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                            }
-                                        });
+                            .setMessage("Есть совпадения в бронировании")
+                            .setCancelable(false)
+                            .setPositiveButton("Буду исправлять",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
                         AlertDialog alert = builder.create();
                         alert.show();
                     }
@@ -358,12 +355,6 @@ public class ChooseDaysActivity extends AppCompatActivity {
         //fT.replace(R.id.fragment_container, new CalendarFragment());
         fT.addToBackStack(null);
         fT.commitAllowingStateLoss();
-    }
-
-    public static Integer dayOfWeek(int day, int month, int year){
-        String days[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-        int a = (14 - month) / 12, y = year - a, m = month + 12 * a - 2;
-        return ((7000 + (day + y + y / 4 - y / 100 + y / 400 + (31 * m) / 12)) % 7) - 1;
     }
 
     private ArrayList<String> makeJson() {

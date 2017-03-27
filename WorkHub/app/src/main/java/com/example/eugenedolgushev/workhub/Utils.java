@@ -91,4 +91,10 @@ public class Utils {
         }
         return false;
     }
+
+    public static Integer dayOfWeek(final int day, final int month, final int year){
+        String days[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        int a = (14 - month) / 12, y = year - a, m = month + 12 * a - 2;
+        return ((7000 + (day + y + y / 4 - y / 100 + y / 400 + (31 * m) / 12)) % 7) - 1;
+    }
 }

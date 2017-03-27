@@ -15,11 +15,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // each data item is just a string in this case
         public TextView mTextView1;
         public TextView mTextView2;
+        public TextView mTextView3;
         public Button deleteItemBtn;
         public ViewHolder(View v) {
             super(v);
             mTextView1 = (TextView) v.findViewById(R.id.test1);
             mTextView2 = (TextView) v.findViewById(R.id.test2);
+            mTextView3 = (TextView) v.findViewById(R.id.test3);
             deleteItemBtn = (Button) v.findViewById(R.id.delete_item);
         }
     }
@@ -48,6 +50,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         holder.mTextView2.setText("Время посещения с " + m_reservationList.get(position).getStartTime().toString()
                 + " до " + String.valueOf(m_reservationList.get(position).getStartTime() +
                 m_reservationList.get(position).getDuration()));
+        holder.mTextView3.setText("Стоимость - " + m_reservationList.get(position).getReservationSum());
         holder.deleteItemBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

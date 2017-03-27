@@ -32,4 +32,7 @@ public class DefaultValues {
             COLUMN_NAME_START_TIME, COLUMN_NAME_DURATION, COLUMN_NAME_PLAN_PRICE, COLUMN_NAME_USER_ID,
             COLUMN_NAME_OFFICE_ADDRESS, COLUMN_NAME_STATUS
     };
+
+    public static String[] DAYS_OF_WEEK = {"Понедельник", "Вторник", "Среда", "Четверг",
+            "Пятница", "Суббота", "Воскресенье"};
 }
