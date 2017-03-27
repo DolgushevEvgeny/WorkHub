@@ -89,6 +89,32 @@ public class MyReservationsActivity extends AppCompatActivity
         });
 
         lvReservations = (RecyclerView) findViewById(R.id.reservations_list_view);
+        lvReservations.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if (dy > 0) {
+                    // Scroll Down
+                    if (addReservationBtn.isShown()) {
+                        addReservationBtn.hide();
+                    }
+                }
+                else if (dy < 0) {
+                    // Scroll Up
+                    if (!addReservationBtn.isShown()) {
+                        addReservationBtn.show();
+                    }
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING){
+                    addReservationBtn.show();
+                }
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
         lvReservations.setLayoutManager(new LinearLayoutManager(this));
         reservationsAdapter = new ReservationsAdapter((ArrayList) reservations);
         lvReservations.setAdapter(reservationsAdapter);
