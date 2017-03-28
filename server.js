@@ -304,7 +304,7 @@ app.get('/setReservation', function(request, response) {
       setReservation(reservationsCollection, reservation.city, reservation.office,
         reservation.plan, reservation.date, reservation.startTime, reservation.duration,
         reservation.planPrice, reservation.officeAddress, reservation.status, reservation.userID);
-      sendEmail();
+      sendEmail(reservation);
     }
     db.close();
     sendResponse(answer, response);
@@ -413,7 +413,7 @@ function checkCondition(firstStartTime, firstDuration, secondStartTime) {
   return false;
 }
 
-function sendEmail() {
+function sendEmail(reservation) {
   var transporter = nodeMailer.createTransport({
     service: 'gmail',
     auth: {
@@ -425,9 +425,8 @@ function sendEmail() {
   var mailOptions = {
     from: '"WorkHub" <baraxlush1995@gmail.com>',
     to: 'eugene.dolgushev@gmail.com',
-    subject: 'Здесь наверно заголовок',
-    text: 'А здесь надеюсь будет содержимое сообщения',
-    html: '<b>Hello world</b>'
+    subject: 'Информация о платеже',
+    html: createMailContent(reservation)
   };
 
   transporter.sendMail(mailOptions, function(error, info) {
@@ -436,6 +435,23 @@ function sendEmail() {
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
   });
+}
+
+function createMailContent(reservation) {
+  var text = '';
+  var time = new Date();
+  var timeText = time.getDate() + '.' + (time.getMonth() + 1) + '.' + time.getFullYear() +
+    '  ' + time.getHours() + ':' + time.getMinutes();
+
+  text += '<p><b>Платеж успешно выполнен</b></p>' +
+    '<p><b>WorkHub</b></p>' + '<p>Дата и время: ' + timeText + '</p>' +
+    '<p>Сумма: ' + (reservation.duration * reservation.planPrice) + ' руб.</p>' +
+    '<p>Ваш план: ' + reservation.plan + '</p>' +
+    '<p>Тариф: ' + reservation.planPrice + '</p>' +
+    '<p>Дата и время посещения: ' + reservation.date + ' c ' + reservation.startTime +
+    ' до ' + (reservation.startTime + reservation.duration) +'</p>';
+
+  return text;
 }
 
 function getListItem(list, hour) {
