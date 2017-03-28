@@ -14,7 +14,7 @@
         android:weightSum="1.0">
 
         <LinearLayout
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:id="@+id/office_info"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -22,20 +22,38 @@
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:paddingStart="12dp"
-            android:paddingEnd="12dp">
+            android:paddingEnd="12dp"
+            android:weightSum="1.0">
 
-            <TextView
-                android:id="@+id/office_info_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"/>
-
-            <Button
-                android:id="@+id/work_time_list_button"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="Расписание"
-                android:background="@color/colorPrimary"/>
+                android:layout_weight="0.7">
+
+                <TextView
+                    android:id="@+id/office_info_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3">
+
+                <Button
+                    android:id="@+id/work_time_list_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Расписание"
+                    android:textColor="@color/white"
+                    android:background="@drawable/selector"/>
+
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
@@ -65,7 +83,7 @@
                 android:id="@+id/office_info_next_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:background="@drawable/selector"
                 android:textColor="@color/white"
                 android:text="Продолжить"/>
         </LinearLayout>

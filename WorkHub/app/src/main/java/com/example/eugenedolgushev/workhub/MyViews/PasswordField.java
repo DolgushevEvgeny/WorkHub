@@ -110,7 +110,7 @@ public class PasswordField extends android.support.v7.widget.AppCompatEditText {
     private void setConfirmButtonEnable(boolean enable) {
         m_confirmBtn.setEnabled(enable);
         if (enable) {
-            m_confirmBtn.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            m_confirmBtn.setBackground(getResources().getDrawable(R.drawable.selector));
         } else {
             m_confirmBtn.setBackgroundColor(getResources().getColor(R.color.blocker));
         }

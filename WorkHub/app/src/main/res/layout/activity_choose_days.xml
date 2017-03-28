@@ -82,7 +82,7 @@
                 android:id="@+id/next"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:background="@drawable/selector"
                 android:textColor="@color/white"
                 android:text="Продолжить"/>
 

@@ -35,7 +35,7 @@
             android:id="@+id/final_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="@drawable/selector"
             android:textColor="@color/white"
             android:text="Завершить"/>
     </LinearLayout>
