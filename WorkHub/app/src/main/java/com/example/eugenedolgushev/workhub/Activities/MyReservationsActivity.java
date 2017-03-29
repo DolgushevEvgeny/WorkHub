@@ -136,28 +136,40 @@ public class MyReservationsActivity extends AppCompatActivity
         userSurname = (TextView) headerView.findViewById(R.id.user_surname_view);
         userSurname.setText(getStringFromSharedPreferences("userSurname", m_context));
 
+        dbManager = new DBManager(this);
+        database = null;
+
+//        reservationsAdapter.setList(dbManager.getFromDB(database, dbManager));
+//        lvReservations.setAdapter(reservationsAdapter);
+
         if (hasConnection(m_context)) {
             getMyReservationsTask = getNewTask();
             getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
         } else {
             showAlertDialog("Нет подключения к интернету", m_context);
+            reservationsAdapter.setList(dbManager.getFromDB(database, dbManager));
+            lvReservations.setAdapter(reservationsAdapter);
         }
-
-        dbManager = new DBManager(this);
-        database = null;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (hasConnection(m_context)) {
-            AsyncTask.Status status = getMyReservationsTask.getStatus();
-            if (status.name().equals("FINISHED")) {
+            if (getMyReservationsTask != null) {
+                AsyncTask.Status status = getMyReservationsTask.getStatus();
+                if (status.name().equals("FINISHED")) {
+                    getMyReservationsTask = getNewTask();
+                    getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
+                }
+            } else {
                 getMyReservationsTask = getNewTask();
                 getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
             }
         } else {
             showAlertDialog("Нет подключения к интернету", m_context);
+            reservationsAdapter.setList(dbManager.getFromDB(database, dbManager));
+            lvReservations.setAdapter(reservationsAdapter);
         }
     }
 
@@ -168,6 +180,10 @@ public class MyReservationsActivity extends AppCompatActivity
                 reservationsAdapter.setList(reservations);
                 lvReservations.setAdapter(reservationsAdapter);
                 checkForUpdates(reservations);
+                for (int i = 0; i < reservations.size(); ++i) {
+                    dbManager.setToDB(database, dbManager, reservations.get(i), m_context);
+                }
+
             }
         }, m_context);
 
