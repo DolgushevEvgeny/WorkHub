@@ -92,13 +92,9 @@ public class AuthorizationActivity extends AppCompatActivity {
     private void getUserID() {
         String savedUserID = getStringFromSharedPreferences("userID", m_context);
         if (savedUserID.length() != 0) {
-            if (hasConnection(m_context)) {
-                Intent intent = new Intent(AuthorizationActivity.this, MyReservationsActivity.class);
-                intent.putExtra("userID", savedUserID);
-                startActivity(intent);
-            } else {
-                showAlertDialog("Нет подключения к интернету", m_context);
-            }
+            Intent intent = new Intent(AuthorizationActivity.this, MyReservationsActivity.class);
+            intent.putExtra("userID", savedUserID);
+            startActivity(intent);
         }
     }
 
