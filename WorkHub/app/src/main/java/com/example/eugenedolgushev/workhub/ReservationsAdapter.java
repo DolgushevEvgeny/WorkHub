@@ -92,7 +92,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         return dayOfWeek(m_reservationList.get(position).getReservationDay(),
                 m_reservationList.get(position).getReservationMonth(), m_reservationList.get(position).getReservationYear()) +
                 ", " + m_reservationList.get(position).getReservationDay() + " " +
-                getMonthFromDate(m_reservationList.get(position).getReservationMonth()) + " " +
+                getMonthFromDate(m_reservationList.get(position).getReservationMonth() - 1) + " " +
                 m_reservationList.get(position).getReservationYear();
     }
 
@@ -102,7 +102,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         return months[month];
     }
 
-    public static String dayOfWeek(int day, int month, int year){
+    private static String dayOfWeek(int day, int month, int year){
         String days[] = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"};
         int a = (14 - month) / 12, y = year - a, m = month + 12 * a - 2;
         return days[((7000 + (day + y + y / 4 - y / 100 + y / 400 + (31 * m) / 12)) % 7) - 1];
