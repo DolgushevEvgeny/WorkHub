@@ -13,6 +13,15 @@ import static com.example.eugenedolgushev.workhub.DefaultValues.SHARED_PREFERENC
 
 public class Utils {
 
+    public static void showConfirmDialog(final String message, final Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Успешно")
+                .setMessage(message)
+                .setCancelable(true);
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     public static void showAlertDialog(final String message, final Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Ошибка")
