@@ -25,7 +25,9 @@ import java.net.URLEncoder;
 import static com.example.eugenedolgushev.workhub.DefaultValues.CHANGE_PASSWORD_URL;
 import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
+import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
 import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
+import static com.example.eugenedolgushev.workhub.Utils.showConfirmDialog;
 
 public class ChangePasswordActivity extends AppCompatActivity {
 
@@ -46,7 +48,11 @@ public class ChangePasswordActivity extends AppCompatActivity {
         confirmPasswordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new ChangePassword().execute(newPasswordView.getText().toString());
+                if (hasConnection(m_context)) {
+                    new ChangePassword().execute(newPasswordView.getText().toString());
+                } else {
+                    showAlertDialog("Нет подключения к интернету", m_context);
+                }
             }
         });
 
@@ -142,7 +148,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                 }
                 if (dataJsonObj.has("message")) {
                     message = dataJsonObj.getString("message");
-                    showAlertDialog(message, m_context);
+                    showConfirmDialog(message, m_context);
                 }
             } catch (JSONException e) {
 
