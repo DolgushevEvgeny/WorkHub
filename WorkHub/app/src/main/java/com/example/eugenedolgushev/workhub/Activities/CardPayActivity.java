@@ -25,6 +25,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
+import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.DefaultValues.SET_RESERVATION;
+import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
+
 public class CardPayActivity extends AppCompatActivity {
     private MyEditText cardNumber1 = null, cardNumber2 = null, cardNumber3 = null, cardNumber4 = null,
             cardValidPeriodMonth = null, cardValidPeriodYear = null, cardOwner = null, cardSafeCode = null;
@@ -68,44 +73,48 @@ public class CardPayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 spinner.setVisibility(View.VISIBLE);
-                if (checkAllFields(cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardValidPeriodMonth,
-                        cardValidPeriodYear, cardOwner, cardSafeCode)) {
+                if (hasConnection(m_context)) {
+                    if (checkAllFields(cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardValidPeriodMonth,
+                            cardValidPeriodYear, cardOwner, cardSafeCode)) {
 
-                    final Integer counter = 1;
-                    haveProcessed = false;
-                    final CanTakePlace canTakePlaceTask = new CanTakePlace(new CanTakePlace.AsyncResponse() {
-                        @Override
-                        public void processFinish(ArrayList<String> dates, ArrayList<Integer> times, String message) {
-                            if (dates.size() > 0) {
-                                datesR.add(dates);
-                                timesR.add(times);
-                            }
-                            if (counter < reservations.size()) {
-                                test(reservations.get(counter), counter + 1);
-                                if (datesR.size() > 0) {
-                                    Utils.showAlertDialog(createMessage(), m_context);
-                                } else {
-                                    for (int i = 0; i < reservations.size(); ++i) {
-                                        new SetReservation().execute(reservations.get(i));
-                                    }
-                                    Intent intent = new Intent(CardPayActivity.this, PayResultActivity.class);
-                                    startActivity(intent);
+                        final Integer counter = 1;
+                        haveProcessed = false;
+                        final CanTakePlace canTakePlaceTask = new CanTakePlace(new CanTakePlace.AsyncResponse() {
+                            @Override
+                            public void processFinish(ArrayList<String> dates, ArrayList<Integer> times, String message) {
+                                if (dates.size() > 0) {
+                                    datesR.add(dates);
+                                    timesR.add(times);
                                 }
-                            } else {
-                                if (datesR.size() > 0) {
-                                    Utils.showAlertDialog(createMessage(), m_context);
-                                } else {
-                                    for (int i = 0; i < reservations.size(); ++i) {
-                                        new SetReservation().execute(reservations.get(i));
+                                if (counter < reservations.size()) {
+                                    test(reservations.get(counter), counter + 1);
+                                    if (datesR.size() > 0) {
+                                        Utils.showAlertDialog(createMessage(), m_context);
+                                    } else {
+                                        for (int i = 0; i < reservations.size(); ++i) {
+                                            new SetReservation().execute(reservations.get(i));
+                                        }
+                                        Intent intent = new Intent(CardPayActivity.this, PayResultActivity.class);
+                                        startActivity(intent);
                                     }
-                                    Intent intent = new Intent(CardPayActivity.this, PayResultActivity.class);
-                                    startActivity(intent);
+                                } else {
+                                    if (datesR.size() > 0) {
+                                        Utils.showAlertDialog(createMessage(), m_context);
+                                    } else {
+                                        for (int i = 0; i < reservations.size(); ++i) {
+                                            new SetReservation().execute(reservations.get(i));
+                                        }
+                                        Intent intent = new Intent(CardPayActivity.this, PayResultActivity.class);
+                                        startActivity(intent);
+                                    }
                                 }
                             }
-                        }
-                    }, m_context);
+                        }, m_context);
 
-                    canTakePlaceTask.execute(reservations.get(0));
+                        canTakePlaceTask.execute(reservations.get(0));
+                    }
+                } else {
+                    showAlertDialog("Нет подключения к интернету", m_context);
                 }
                 spinner.setVisibility(View.INVISIBLE);
             }
@@ -187,7 +196,7 @@ public class CardPayActivity extends AppCompatActivity {
             }
 
             try {
-                URL requestUrl = new URL(URL1 + "/?" + "reservation=" + reservation);
+                URL requestUrl = new URL(MAIN_URL + SET_RESERVATION + "/?" + "reservation=" + reservation);
 
                 HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
                 connection.setRequestMethod("GET");
