@@ -23,6 +23,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 
 import static com.example.eugenedolgushev.workhub.DefaultValues.DAYS_OF_WEEK;
+import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
 
 public class OfficeDetailInfoActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -83,11 +85,15 @@ public class OfficeDetailInfoActivity extends AppCompatActivity implements OnMap
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(OfficeDetailInfoActivity.this, PlansActivity.class);
-                intent.putExtra("cityName", cityName);
-                intent.putExtra("officeName", officeName);
-                intent.putExtra("officeAddress", officeAddress);
-                startActivity(intent);
+                if (hasConnection(m_context)) {
+                    Intent intent = new Intent(OfficeDetailInfoActivity.this, PlansActivity.class);
+                    intent.putExtra("cityName", cityName);
+                    intent.putExtra("officeName", officeName);
+                    intent.putExtra("officeAddress", officeAddress);
+                    startActivity(intent);
+                } else {
+                    showAlertDialog("Нет подключения к интернету", m_context);
+                }
             }
         });
 
