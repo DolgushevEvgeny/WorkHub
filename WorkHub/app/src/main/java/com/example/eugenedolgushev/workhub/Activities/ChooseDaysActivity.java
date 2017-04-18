@@ -40,8 +40,10 @@ import java.util.List;
 
 import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
 import static com.example.eugenedolgushev.workhub.DefaultValues.REMOVE_RESERVATION_URL;
-import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.dayOfWeek;
+import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
+import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
 
 public class ChooseDaysActivity extends AppCompatActivity {
     private MaterialCalendarView calendarView = null;
@@ -83,20 +85,24 @@ public class ChooseDaysActivity extends AppCompatActivity {
                     Utils.showAlertDialog("Нельзя занять", m_context);
                     calendarView.setDateSelected(CalendarDay.from(year, month - 1, day), false);
                 } else if (time < date.getDate().getTime()) {
-                    day = date.getDay();
-                    month = date.getMonth() + 1;
-                    year = date.getYear();
-                    dayOfWeek = dayOfWeek(day, month, year);
+                    if (hasConnection(m_context)) {
+                        day = date.getDay();
+                        month = date.getMonth() + 1;
+                        year = date.getYear();
+                        dayOfWeek = dayOfWeek(day, month, year);
 
-                    Intent intent = new Intent(ChooseDaysActivity.this, ChooseTimeActivity.class);
-                    intent.putExtra("cityName", cityName);
-                    intent.putExtra("officeName", officeName);
-                    intent.putExtra("dayOfWeek", dayOfWeek);
-                    intent.putExtra("planName", planName);
-                    intent.putExtra("date", "" + day + "." + month + "." + year);
-                    intent.putExtra("planPrice", planPrice);
-                    intent.putExtra("officeAddress", officeAddress);
-                    startActivityForResult(intent, 1);
+                        Intent intent = new Intent(ChooseDaysActivity.this, ChooseTimeActivity.class);
+                        intent.putExtra("cityName", cityName);
+                        intent.putExtra("officeName", officeName);
+                        intent.putExtra("dayOfWeek", dayOfWeek);
+                        intent.putExtra("planName", planName);
+                        intent.putExtra("date", "" + day + "." + month + "." + year);
+                        intent.putExtra("planPrice", planPrice);
+                        intent.putExtra("officeAddress", officeAddress);
+                        startActivityForResult(intent, 1);
+                    } else {
+                        showAlertDialog("Нет подключения к интернету", m_context);
+                    }
                 }
             }
         });
@@ -105,39 +111,43 @@ public class ChooseDaysActivity extends AppCompatActivity {
         continueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkReservationsOnCollision()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDaysActivity.this);
-                    builder.setTitle("Важное сообщение!")
-                        .setMessage("Совпадений нет")
-                        .setCancelable(false)
-                        .setPositiveButton("Продолжить",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    Intent intent = new Intent(ChooseDaysActivity.this, CardPayActivity.class);
-                                    intent.putStringArrayListExtra("reservations", makeJson());
-                                    dialog.cancel();
-                                    startActivityForResult(intent, 1);
-                                }
-                            });
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                } else {
-                    if (reservations.size() == 0) {
-                        Utils.showAlertDialog("Нужно сделать хотя бы 1 бронирование", m_context);
-                    } else {
+                if (hasConnection(m_context)) {
+                    if (checkReservationsOnCollision()) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDaysActivity.this);
                         builder.setTitle("Важное сообщение!")
-                            .setMessage("Есть совпадения в бронировании")
+                            .setMessage("Совпадений нет")
                             .setCancelable(false)
-                            .setPositiveButton("Буду исправлять",
+                            .setPositiveButton("Продолжить",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
+                                        Intent intent = new Intent(ChooseDaysActivity.this, CardPayActivity.class);
+                                        intent.putStringArrayListExtra("reservations", makeJson());
                                         dialog.cancel();
+                                        startActivityForResult(intent, 1);
                                     }
                                 });
                         AlertDialog alert = builder.create();
                         alert.show();
+                    } else {
+                        if (reservations.size() == 0) {
+                            Utils.showAlertDialog("Нужно сделать хотя бы 1 бронирование", m_context);
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDaysActivity.this);
+                            builder.setTitle("Важное сообщение!")
+                                .setMessage("Есть совпадения в бронировании")
+                                .setCancelable(false)
+                                .setPositiveButton("Буду исправлять",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                        }
                     }
+                } else {
+                    showAlertDialog("Нет подключения к интернету", m_context);
                 }
             }
         });
@@ -239,17 +249,17 @@ public class ChooseDaysActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        for (int i = 0; i < reservations.size(); ++i) {
-            Reservation reservation = reservations.get(i);
-            String date = reservation.getReservationDay() + "."
-                    + reservation.getReservationMonth() + "."
-                    + reservation.getReservationYear();
-
-            String startTime = reservation.getStartTime().toString();
-            String duration = reservation.getDuration().toString();
-
-            new removeReservation().execute(date, startTime, duration);
-        }
+//        for (int i = 0; i < reservations.size(); ++i) {
+//            Reservation reservation = reservations.get(i);
+//            String date = reservation.getReservationDay() + "."
+//                    + reservation.getReservationMonth() + "."
+//                    + reservation.getReservationYear();
+//
+//            String startTime = reservation.getStartTime().toString();
+//            String duration = reservation.getDuration().toString();
+//
+//            new removeReservation().execute(date, startTime, duration);
+//        }
     }
 
     class removeReservation extends AsyncTask<String, Void, String> {
