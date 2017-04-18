@@ -36,7 +36,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.example.eugenedolgushev.workhub.DefaultValues.GET_DAYWORKTIME;
+import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
+import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
 
 public class ChooseTimeActivity extends AppCompatActivity {
 
@@ -66,7 +70,11 @@ public class ChooseTimeActivity extends AppCompatActivity {
 
         m_context = this;
 
-        new getDayWorkTime().execute();
+        if (hasConnection(m_context)) {
+            new getDayWorkTime().execute();
+        } else {
+            showAlertDialog("Нет подключения к интернету", m_context);
+        }
 
         timeListView = (ListView) findViewById(R.id.time_list_view);
         timeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -92,42 +100,46 @@ public class ChooseTimeActivity extends AppCompatActivity {
         takePlaceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkTime()) {
-                    final CanTakePlace canTakePlaceTask = new CanTakePlace(new CanTakePlace.AsyncResponse() {
-                        @Override
-                        public void processFinish(final ArrayList<String> dates, final ArrayList<Integer> times, String message) {
-                            if (dates.size() == 0) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ChooseTimeActivity.this);
-                                builder.setTitle("Важное сообщение!")
-                                    .setMessage("Все свободно, можно занимать")
-                                    .setCancelable(false)
-                                    .setNegativeButton("ОК, пока еще подумаю",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                            }
-                                        })
-                                    .setPositiveButton("ОК, занимаю",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                Intent intent = new Intent();
-                                                int startTime = (int) timesList.get(0);
-                                                intent.putExtra("startTime", startTime);
-                                                intent.putExtra("duration", timesList.size());
-                                                setResult(1, intent);
-                                                dialog.cancel();
-                                                finish();
-                                            }
-                                        });
-                                AlertDialog alert = builder.create();
-                                alert.show();
-                            } else {
-                                Utils.showAlertDialog(message, m_context);
+                if (hasConnection(m_context)) {
+                    if (checkTime()) {
+                        final CanTakePlace canTakePlaceTask = new CanTakePlace(new CanTakePlace.AsyncResponse() {
+                            @Override
+                            public void processFinish(final ArrayList<String> dates, final ArrayList<Integer> times, String message) {
+                                if (dates.size() == 0) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(ChooseTimeActivity.this);
+                                    builder.setTitle("Важное сообщение!")
+                                        .setMessage("Все свободно, можно занимать")
+                                        .setCancelable(false)
+                                        .setNegativeButton("ОК, пока еще подумаю",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            })
+                                        .setPositiveButton("ОК, занимаю",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Intent intent = new Intent();
+                                                    int startTime = (int) timesList.get(0);
+                                                    intent.putExtra("startTime", startTime);
+                                                    intent.putExtra("duration", timesList.size());
+                                                    setResult(1, intent);
+                                                    dialog.cancel();
+                                                    finish();
+                                                }
+                                            });
+                                    AlertDialog alert = builder.create();
+                                    alert.show();
+                                } else {
+                                    Utils.showAlertDialog(message, m_context);
+                                }
                             }
-                        }
-                    }, m_context);
+                        }, m_context);
 
-                    canTakePlaceTask.execute(makeJson());
+                        canTakePlaceTask.execute(makeJson());
+                    }
+                } else {
+                    showAlertDialog("Нет подключения к интернету", m_context);
                 }
             }
         });
@@ -201,7 +213,7 @@ public class ChooseTimeActivity extends AppCompatActivity {
 
             String requestParams = "city=" + city + "&office=" + officeName + "&day=" + dayOfWeek;
             try {
-                URL requestUrl = new URL(url + "/?" + requestParams);
+                URL requestUrl = new URL(MAIN_URL + GET_DAYWORKTIME + "/?" + requestParams);
 
                 connection = (HttpURLConnection) requestUrl.openConnection();
                 connection.setRequestMethod("GET");
