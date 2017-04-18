@@ -15,6 +15,11 @@ import com.example.eugenedolgushev.workhub.Plan;
 import com.example.eugenedolgushev.workhub.PlanList;
 import com.example.eugenedolgushev.workhub.R;
 
+import static com.example.eugenedolgushev.workhub.DefaultValues.GET_PLANS;
+import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
+
 public class PlansActivity extends AppCompatActivity {
 
     private static final String URL = "http://192.168.0.32:3000/getPlans";
@@ -40,15 +45,19 @@ public class PlansActivity extends AppCompatActivity {
         planListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ListAdapter planListViewAdapter = planListView.getAdapter();
-                Plan plan = (Plan) planListViewAdapter.getItem(position);
-                Intent intent = new Intent(PlansActivity.this, ChooseDaysActivity.class);
-                intent.putExtra("cityName", cityName);
-                intent.putExtra("officeName", officeName);
-                intent.putExtra("officeAddress", officeAddress);
-                intent.putExtra("planPrice", plan.getPlanPrice());
-                intent.putExtra("planName", plan.getPlanName());
-                startActivity(intent);
+                if (hasConnection(m_context)) {
+                    ListAdapter planListViewAdapter = planListView.getAdapter();
+                    Plan plan = (Plan) planListViewAdapter.getItem(position);
+                    Intent intent = new Intent(PlansActivity.this, ChooseDaysActivity.class);
+                    intent.putExtra("cityName", cityName);
+                    intent.putExtra("officeName", officeName);
+                    intent.putExtra("officeAddress", officeAddress);
+                    intent.putExtra("planPrice", plan.getPlanPrice());
+                    intent.putExtra("planName", plan.getPlanName());
+                    startActivity(intent);
+                } else {
+                    showAlertDialog("Нет подключения к интернету", m_context);
+                }
             }
         });
 
@@ -61,7 +70,7 @@ public class PlansActivity extends AppCompatActivity {
             }
         }, m_context);
 
-        getPlansTask.execute(cityName, officeName, URL);
+        getPlansTask.execute(cityName, officeName, MAIN_URL + GET_PLANS);
     }
 
     @Override
