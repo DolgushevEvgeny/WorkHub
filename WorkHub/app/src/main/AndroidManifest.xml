@@ -26,21 +26,37 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.PlansActivity" />
-        <activity android:name=".Activities.OfficesActivity" />
-        <activity android:name=".Activities.ChooseDaysActivity" />
-        <activity android:name=".Activities.ChooseTimeActivity" />
-        <activity android:name=".Activities.OrderInfoActivity" />
-        <activity android:name=".Activities.CardPayActivity" />
-        <activity android:name=".Activities.PayResultActivity" />
+        <activity
+            android:name=".Activities.PlansActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activities.OfficesActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activities.ChooseDaysActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activities.ChooseTimeActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activities.OrderInfoActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activities.CardPayActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activities.PayResultActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Activities.MyReservationsActivity"
             android:label="@string/title_activity_my_reservations2"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.MainActivity"
             android:label="@string/title_activity_main"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -56,15 +72,20 @@
 
         <activity
             android:name=".Activities.OfficeDetailInfoActivity"
-            android:label="@string/title_activity_office_detail_info" />
+            android:label="@string/title_activity_office_detail_info"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Activities.SettingActivity"
             android:label="@string/title_activity_setting"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Activities.ChangePasswordActivity" />
+        <activity
+            android:name=".Activities.ChangePasswordActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Activities.ChangeCityActivity"
             android:label="@string/title_activity_change_city"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <receiver android:name=".TimeNotification" />
