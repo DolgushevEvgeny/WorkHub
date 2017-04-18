@@ -15,6 +15,11 @@ import com.example.eugenedolgushev.workhub.Office;
 import com.example.eugenedolgushev.workhub.OfficeList;
 import com.example.eugenedolgushev.workhub.R;
 
+import static com.example.eugenedolgushev.workhub.DefaultValues.GET_OFFICES;
+import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
+import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
+import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
+
 public class OfficesActivity extends AppCompatActivity {
     private ListView lvOffices;
     private Context context;
@@ -37,17 +42,21 @@ public class OfficesActivity extends AppCompatActivity {
         lvOffices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ListAdapter officeListViewAdapter = lvOffices.getAdapter();
-                Office office = (Office) officeListViewAdapter.getItem(position);
+                if (hasConnection(context)) {
+                    ListAdapter officeListViewAdapter = lvOffices.getAdapter();
+                    Office office = (Office) officeListViewAdapter.getItem(position);
 
-                Intent intent = new Intent(OfficesActivity.this, OfficeDetailInfoActivity.class);
-                intent.putExtra("cityName", cityName);
-                intent.putExtra("officeName", office.getOfficeName());
-                intent.putExtra("officeAddress", office.getOfficeAddress());
-                intent.putExtra("latitude", office.getLatitude());
-                intent.putExtra("longitude", office.getLongitude());
-                intent.putExtra("office", office);
-                startActivity(intent);
+                    Intent intent = new Intent(OfficesActivity.this, OfficeDetailInfoActivity.class);
+                    intent.putExtra("cityName", cityName);
+                    intent.putExtra("officeName", office.getOfficeName());
+                    intent.putExtra("officeAddress", office.getOfficeAddress());
+                    intent.putExtra("latitude", office.getLatitude());
+                    intent.putExtra("longitude", office.getLongitude());
+                    intent.putExtra("office", office);
+                    startActivity(intent);
+                } else {
+                    showAlertDialog("Нет подключения к интернету", context);
+                }
             }
         });
 
@@ -60,7 +69,7 @@ public class OfficesActivity extends AppCompatActivity {
             }
         }, context);
 
-        getOfficeTask.execute(cityName, URL);
+        getOfficeTask.execute(cityName, MAIN_URL + GET_OFFICES);
     }
 
     @Override
