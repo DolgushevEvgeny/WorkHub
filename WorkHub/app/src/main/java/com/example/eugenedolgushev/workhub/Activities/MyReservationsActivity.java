@@ -89,10 +89,10 @@ public class MyReservationsActivity extends AppCompatActivity
         });
 
         lvReservations = (RecyclerView) findViewById(R.id.reservations_list_view);
-        lvReservations.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        lvReservations.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
-                if (dy > 0) {
+                if (dy >= 0) {
                     // Scroll Down
                     if (addReservationBtn.isShown()) {
                         addReservationBtn.hide();
@@ -110,7 +110,7 @@ public class MyReservationsActivity extends AppCompatActivity
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
 
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING){
-                    addReservationBtn.show();
+                    addReservationBtn.hide();
                 }
                 super.onScrollStateChanged(recyclerView, newState);
             }
@@ -148,7 +148,7 @@ public class MyReservationsActivity extends AppCompatActivity
         } else {
             showAlertDialog("Нет подключения к интернету", m_context);
             reservationsAdapter.setList(dbManager.getFromDB(database, dbManager));
-            lvReservations.setAdapter(reservationsAdapter);
+            lvReservations.swapAdapter(reservationsAdapter, false);
         }
     }
 

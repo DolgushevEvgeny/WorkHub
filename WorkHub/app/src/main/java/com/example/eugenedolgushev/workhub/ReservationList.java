@@ -47,8 +47,8 @@ public class ReservationList extends BaseAdapter {
 
         // заполняем View в пункте списка данными
         ((TextView) view.findViewById(R.id.reservation_date)).setText(reservation.getReservationDate());
-        ((TextView) view.findViewById(R.id.reservation_start_time)).setText(String.valueOf(reservation.getStartTime()));
-        ((TextView) view.findViewById(R.id.reservation_office_address)).setText(reservation.getOfficeName() +
+        ((TextView) view.findViewById(R.id.reservation_start_time_more)).setText(String.valueOf(reservation.getStartTime()));
+        ((TextView) view.findViewById(R.id.reservation_office_address_more)).setText(reservation.getOfficeName() +
             ", " + reservation.getOfficeAddress());
 
         return view;

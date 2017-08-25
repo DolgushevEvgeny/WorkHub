@@ -17,6 +17,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            buildConfigField("String", "BASIC_URL", "\"http://192.168.0.32:3000/\"")
+        }
     }
 }
 
@@ -30,6 +33,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
+    compile 'com.google.code.gson:gson:2.8.1'
+    compile 'com.loopj.android:android-async-http:1.4.9'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:design:23.4.0'
     compile 'com.prolificinteractive:material-calendarview:1.4.2'
