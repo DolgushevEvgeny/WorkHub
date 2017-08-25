@@ -11,8 +11,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.eugenedolgushev.workhub.AsyncTasks.Login;
+import com.example.eugenedolgushev.workhub.Api.LoginApi.LoginApiListener;
+import com.example.eugenedolgushev.workhub.Api.LoginApi.impl.LoginApiImpl;
 import com.example.eugenedolgushev.workhub.R;
+import com.loopj.android.http.RequestParams;
 
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
@@ -23,7 +25,8 @@ public class AuthorizationActivity extends AppCompatActivity {
     private EditText loginField;
     TextInputEditText passwordField;
     private Button loginButton;
-    private Context m_context;
+    private Context context;
+    private LoginApiImpl loginApi;
 
     private boolean hasCity = false;
 
@@ -33,7 +36,9 @@ public class AuthorizationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_authorization);
         setTitle("Авторизация");
 
-        m_context = this;
+        context = this;
+
+        loginApi = new LoginApiImpl(context);
 
         loginField = (EditText) findViewById(R.id.login_field);
         passwordField = (TextInputEditText) findViewById(R.id.password_field);
@@ -42,24 +47,31 @@ public class AuthorizationActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (hasConnection(m_context)) {
+                if (hasConnection(context)) {
                     String login = loginField.getText().toString();
                     String password = passwordField.getText().toString();
 
-                    new Login(new Login.AsyncResponse() {
-                        @Override
-                        public void processFinish(String userID) {
-                            putSharedPreferences(userID);
-                            getUserID();
-                        }
-                    }, m_context).execute(login, password);
+                    RequestParams params  = new RequestParams();
+                    params.put("login", login);
+                    params.put("password", password);
+                    login(params);
                 } else {
-                    showAlertDialog("Нет подключения к интернету", m_context);
+                    showAlertDialog("Нет подключения к интернету", context);
                 }
             }
         });
 
         getCity();
+    }
+
+    private void login(final RequestParams params) {
+        loginApi.login(params, new LoginApiListener() {
+            @Override
+            public void onLogin(final String userID) {
+                putSharedPreferences(userID);
+                getUserID();
+            }
+        });
     }
 
     @Override
@@ -75,13 +87,13 @@ public class AuthorizationActivity extends AppCompatActivity {
     }
 
     private void getCity() {
-        String city = getStringFromSharedPreferences("cities", m_context);
+        String city = getStringFromSharedPreferences("cities", context);
         if (city.length() == 0) {
-            if (hasConnection(m_context)) {
+            if (hasConnection(context)) {
                 Intent intent = new Intent(AuthorizationActivity.this, ChangeCityActivity.class);
                 startActivityForResult(intent, 1);
             } else {
-                showAlertDialog("Нет подключения к интернету", m_context);
+                showAlertDialog("Нет подключения к интернету", context);
             }
         } else {
             hasCity = true;
@@ -90,7 +102,7 @@ public class AuthorizationActivity extends AppCompatActivity {
     }
 
     private void getUserID() {
-        String savedUserID = getStringFromSharedPreferences("userID", m_context);
+        String savedUserID = getStringFromSharedPreferences("userID", context);
         if (savedUserID.length() != 0) {
             Intent intent = new Intent(AuthorizationActivity.this, MyReservationsActivity.class);
             intent.putExtra("userID", savedUserID);
@@ -99,8 +111,8 @@ public class AuthorizationActivity extends AppCompatActivity {
     }
 
     private void putSharedPreferences(String userID) {
-        setStringToSharedPreferences("userID", userID, m_context);
-        setStringToSharedPreferences("password", passwordField.getText().toString().trim(), m_context);
+        setStringToSharedPreferences("userID", userID, context);
+        setStringToSharedPreferences("password", passwordField.getText().toString().trim(), context);
     }
 
     @Override
@@ -109,7 +121,7 @@ public class AuthorizationActivity extends AppCompatActivity {
 
         if (requestCode == 1) {
             if (resultCode == 0) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(m_context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Ошибка")
                     .setMessage("Нужно обязательно выбрать город")
                     .setCancelable(false)
