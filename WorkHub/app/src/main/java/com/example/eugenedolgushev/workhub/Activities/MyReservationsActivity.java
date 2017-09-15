@@ -4,8 +4,8 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -21,21 +21,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.eugenedolgushev.workhub.AsyncTasks.GetMyReservations;
+import com.example.eugenedolgushev.workhub.Api.ReservationApi.ReservationApi;
+import com.example.eugenedolgushev.workhub.Api.ReservationApi.ReservationApiListener;
 import com.example.eugenedolgushev.workhub.DBManager;
 import com.example.eugenedolgushev.workhub.R;
 import com.example.eugenedolgushev.workhub.Reservation;
 import com.example.eugenedolgushev.workhub.ReservationsAdapter;
 import com.example.eugenedolgushev.workhub.TimeNotification;
+import com.loopj.android.http.RequestParams;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
-import static com.example.eugenedolgushev.workhub.DefaultValues.MY_RESERVATIONS_URL;
 import static com.example.eugenedolgushev.workhub.DefaultValues.NOTIFICATION_DELAY;
+import static com.example.eugenedolgushev.workhub.DefaultValues.SHARED_PREFERENCES_NAME;
 import static com.example.eugenedolgushev.workhub.Utils.compareDates;
 import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
@@ -48,7 +49,7 @@ public class MyReservationsActivity extends AppCompatActivity
     // Идентификатор уведомления
     private static final int NOTIFY_ID = 101;
 
-    private Context m_context = null;
+    private Context context = null;
     private FloatingActionButton addReservationBtn = null;
     private TextView userName, userSurname;
 
@@ -56,10 +57,10 @@ public class MyReservationsActivity extends AppCompatActivity
     private RecyclerView lvReservations = null;
     private ReservationsAdapter reservationsAdapter;
     private List<Reservation> reservations = new ArrayList<Reservation>();
-    private GetMyReservations getMyReservationsTask;
 
     private DBManager dbManager;
     private SQLiteDatabase database;
+    private ReservationApi reservationApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +68,10 @@ public class MyReservationsActivity extends AppCompatActivity
         setContentView(R.layout.activity_my_reservations2);
         setTitle("Ваши бронирования");
 
-        m_context = this;
+        context = this;
 
-        cityName = getStringFromSharedPreferences("cities", m_context);
+        reservationApi = new ReservationApi(context);
+        cityName = getStringFromSharedPreferences("cities", context);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -78,12 +80,12 @@ public class MyReservationsActivity extends AppCompatActivity
         addReservationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (hasConnection(m_context)) {
+                if (hasConnection(context)) {
                     Intent intent = new Intent(MyReservationsActivity.this, OfficesActivity.class);
-                    intent.putExtra("cityName", getStringFromSharedPreferences("cities", m_context));
+                    intent.putExtra("cityName", getStringFromSharedPreferences("cities", context));
                     startActivity(intent);
                 } else {
-                    showAlertDialog("Нет подключения к интернету", m_context);
+                    showAlertDialog("Нет подключения к интернету", context);
                 }
             }
         });
@@ -97,8 +99,7 @@ public class MyReservationsActivity extends AppCompatActivity
                     if (addReservationBtn.isShown()) {
                         addReservationBtn.hide();
                     }
-                }
-                else if (dy < 0) {
+                } else if (dy < 0) {
                     // Scroll Up
                     if (!addReservationBtn.isShown()) {
                         addReservationBtn.show();
@@ -108,7 +109,6 @@ public class MyReservationsActivity extends AppCompatActivity
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING){
                     addReservationBtn.hide();
                 }
@@ -131,63 +131,57 @@ public class MyReservationsActivity extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
 
         userName = (TextView) headerView.findViewById(R.id.user_name_view);
-        userName.setText(getStringFromSharedPreferences("userName", m_context));
+        userName.setText(getStringFromSharedPreferences("userName", context));
 
         userSurname = (TextView) headerView.findViewById(R.id.user_surname_view);
-        userSurname.setText(getStringFromSharedPreferences("userSurname", m_context));
+        userSurname.setText(getStringFromSharedPreferences("userSurname", context));
 
         dbManager = new DBManager(this);
         database = null;
 
-//        reservationsAdapter.setList(dbManager.getFromDB(database, dbManager));
-//        lvReservations.setAdapter(reservationsAdapter);
-
-        if (hasConnection(m_context)) {
-            getMyReservationsTask = getNewTask();
-            getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
+        if (hasConnection(context)) {
+            getReservations();
         } else {
-            showAlertDialog("Нет подключения к интернету", m_context);
-            reservationsAdapter.setList(dbManager.getFromDB(database, dbManager));
-            lvReservations.swapAdapter(reservationsAdapter, false);
+            loadReservationFromDB();
         }
+    }
+
+    private void loadReservations(final RequestParams params) {
+        reservationApi.getReservations(params, new ReservationApiListener() {
+            @Override
+            public void onReservationsLoad(ArrayList<Reservation> reservations) {
+                reservationsAdapter.setList(reservations);
+                lvReservations.swapAdapter(reservationsAdapter, false);
+                checkForUpdates(reservations);
+                for (int i = 0; i < reservations.size(); ++i) {
+                    dbManager.setToDB(database, dbManager, reservations.get(i), context);
+                }
+            }
+        });
+    }
+
+    private void getReservations() {
+        RequestParams params = new RequestParams();
+        SharedPreferences sPref = context
+                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        params.put("userID", sPref.getString("userID", ""));
+        loadReservations(params);
+    }
+
+    private void loadReservationFromDB() {
+        showAlertDialog("Нет подключения к интернету", context);
+        reservationsAdapter.setList(dbManager.getFromDB(database, dbManager));
+        lvReservations.swapAdapter(reservationsAdapter, false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (hasConnection(m_context)) {
-            if (getMyReservationsTask != null) {
-                AsyncTask.Status status = getMyReservationsTask.getStatus();
-                if (status.name().equals("FINISHED")) {
-                    getMyReservationsTask = getNewTask();
-                    getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
-                }
-            } else {
-                getMyReservationsTask = getNewTask();
-                getMyReservationsTask.execute(MAIN_URL + MY_RESERVATIONS_URL);
-            }
+        if (hasConnection(context)) {
+            getReservations();
         } else {
-            showAlertDialog("Нет подключения к интернету", m_context);
-            reservationsAdapter.setList(dbManager.getFromDB(database, dbManager));
-            lvReservations.setAdapter(reservationsAdapter);
+            loadReservationFromDB();
         }
-    }
-
-    private GetMyReservations getNewTask() {
-        GetMyReservations getMyReservationsTask = new GetMyReservations(new GetMyReservations.AsyncResponse() {
-            @Override
-            public void processFinish(ArrayList<Reservation> reservations) {
-                reservationsAdapter.setList(reservations);
-                lvReservations.setAdapter(reservationsAdapter);
-                checkForUpdates(reservations);
-                for (int i = 0; i < reservations.size(); ++i) {
-                    dbManager.setToDB(database, dbManager, reservations.get(i), m_context);
-                }
-
-            }
-        }, m_context);
-
-        return getMyReservationsTask;
     }
 
     @Override
@@ -241,7 +235,7 @@ public class MyReservationsActivity extends AppCompatActivity
     }
 
     private void logOut() {
-        removeSharedPreferences("userID", m_context);
+        removeSharedPreferences("userID", context);
 
         Intent intent = new Intent(MyReservationsActivity.this, AuthorizationActivity.class);
         startActivity(intent);
@@ -272,7 +266,7 @@ public class MyReservationsActivity extends AppCompatActivity
         calendar.set(Calendar.MILLISECOND, 0);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(m_context, TimeNotification.class);
+        Intent intent = new Intent(context, TimeNotification.class);
         intent.putExtra("date", reservation.getReservationDate());
         intent.putExtra("officeName", reservation.getOfficeName());
         intent.putExtra("officeAddress", reservation.getOfficeAddress());
