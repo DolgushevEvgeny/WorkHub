@@ -16,7 +16,7 @@ import android.widget.ListView;
 
 import com.example.eugenedolgushev.workhub.AsyncTasks.CanTakePlace;
 import com.example.eugenedolgushev.workhub.R;
-import com.example.eugenedolgushev.workhub.Time;
+import com.example.eugenedolgushev.workhub.Model.Time;
 import com.example.eugenedolgushev.workhub.TimeList;
 import com.example.eugenedolgushev.workhub.Utils;
 

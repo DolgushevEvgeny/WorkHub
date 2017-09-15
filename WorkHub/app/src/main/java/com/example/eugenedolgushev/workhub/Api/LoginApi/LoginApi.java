@@ -1,4 +1,4 @@
-package com.example.eugenedolgushev.workhub.Api.LoginApi.impl;
+package com.example.eugenedolgushev.workhub.Api.LoginApi;
 
 import android.content.Context;
 
@@ -13,12 +13,12 @@ import org.json.JSONObject;
 import static com.example.eugenedolgushev.workhub.Utils.setStringToSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
 
-public class LoginApiImpl extends BaseApi {
+public class LoginApi extends BaseApi {
 
     private static final String URL = "login";
     private Context context;
 
-    public LoginApiImpl(final Context context) {
+    public LoginApi(final Context context) {
         super();
         this.context = context;
     }

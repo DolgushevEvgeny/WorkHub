@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.example.eugenedolgushev.workhub.Office;
+import com.example.eugenedolgushev.workhub.Model.Office;
 import com.example.eugenedolgushev.workhub.OfficeList;
 import com.example.eugenedolgushev.workhub.Utils;
 

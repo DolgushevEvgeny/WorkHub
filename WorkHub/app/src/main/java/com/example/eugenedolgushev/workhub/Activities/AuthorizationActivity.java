@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.eugenedolgushev.workhub.Api.LoginApi.LoginApiListener;
-import com.example.eugenedolgushev.workhub.Api.LoginApi.impl.LoginApiImpl;
+import com.example.eugenedolgushev.workhub.Api.LoginApi.LoginApi;
 import com.example.eugenedolgushev.workhub.R;
 import com.loopj.android.http.RequestParams;
 
@@ -26,7 +26,7 @@ public class AuthorizationActivity extends AppCompatActivity {
     TextInputEditText passwordField;
     private Button loginButton;
     private Context context;
-    private LoginApiImpl loginApi;
+    private LoginApi loginApi;
 
     private boolean hasCity = false;
 
@@ -38,7 +38,7 @@ public class AuthorizationActivity extends AppCompatActivity {
 
         context = this;
 
-        loginApi = new LoginApiImpl(context);
+        loginApi = new LoginApi(context);
 
         loginField = (EditText) findViewById(R.id.login_field);
         passwordField = (TextInputEditText) findViewById(R.id.password_field);

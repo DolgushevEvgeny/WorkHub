@@ -11,7 +11,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.example.eugenedolgushev.workhub.AsyncTasks.GetOffices;
-import com.example.eugenedolgushev.workhub.Office;
+import com.example.eugenedolgushev.workhub.Model.Office;
 import com.example.eugenedolgushev.workhub.OfficeList;
 import com.example.eugenedolgushev.workhub.R;
 

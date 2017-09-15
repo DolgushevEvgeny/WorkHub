@@ -1,4 +1,4 @@
-package com.example.eugenedolgushev.workhub;
+package com.example.eugenedolgushev.workhub.Model;
 
 public class Time {
     private Boolean m_isChoose = false;

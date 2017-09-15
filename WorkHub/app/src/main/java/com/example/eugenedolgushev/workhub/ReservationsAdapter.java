@@ -84,7 +84,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
     }
 
     public void setList(ArrayList<Reservation> list) {
-        m_reservationList = list;
+        m_reservationList.addAll(list);
         notifyDataSetChanged();
     }
 

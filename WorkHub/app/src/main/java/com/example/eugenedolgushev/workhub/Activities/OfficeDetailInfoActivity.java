@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.eugenedolgushev.workhub.Office;
+import com.example.eugenedolgushev.workhub.Model.Office;
 import com.example.eugenedolgushev.workhub.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;

@@ -1,4 +1,4 @@
-package com.example.eugenedolgushev.workhub;
+package com.example.eugenedolgushev.workhub.Model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

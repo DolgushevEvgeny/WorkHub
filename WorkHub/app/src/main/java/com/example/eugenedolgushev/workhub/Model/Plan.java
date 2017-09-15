@@ -1,4 +1,4 @@
-package com.example.eugenedolgushev.workhub;
+package com.example.eugenedolgushev.workhub.Model;
 
 public class Plan {
     private String m_planName = "";

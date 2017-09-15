@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.example.eugenedolgushev.workhub.Model.Time;
+
 import java.util.ArrayList;
 
 public class TimeList extends BaseAdapter {

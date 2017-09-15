@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.example.eugenedolgushev.workhub.Model.Plan;
+
 import java.util.ArrayList;
 
 public class PlanList extends BaseAdapter {

@@ -11,7 +11,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.example.eugenedolgushev.workhub.AsyncTasks.GetPlans;
-import com.example.eugenedolgushev.workhub.Plan;
+import com.example.eugenedolgushev.workhub.Model.Plan;
 import com.example.eugenedolgushev.workhub.PlanList;
 import com.example.eugenedolgushev.workhub.R;
 
