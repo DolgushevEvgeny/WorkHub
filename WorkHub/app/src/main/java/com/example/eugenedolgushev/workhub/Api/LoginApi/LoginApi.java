@@ -3,8 +3,7 @@ package com.example.eugenedolgushev.workhub.Api.LoginApi;
 import android.content.Context;
 
 import com.example.eugenedolgushev.workhub.Api.BaseApi;
-import com.example.eugenedolgushev.workhub.Api.LoginApi.LoginApiListener;
-import com.example.eugenedolgushev.workhub.AsyncTask.OnAsyncTaskCompleted;
+import com.example.eugenedolgushev.workhub.Api.OnAsyncTaskCompleted;
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONException;
@@ -33,11 +32,11 @@ public class LoginApi extends BaseApi {
                     if (object.has("_id")) {
                         userID = object.getString("_id");
                     }
-                    if (object.has("userName")) {
+                    if (object.has("name")) {
                         String userName = object.getString("userName");
                         setStringToSharedPreferences("userName", userName, context);
                     }
-                    if (object.has("userSurname")) {
+                    if (object.has("surname")) {
                         String userSurname = object.getString("userSurname");
                         setStringToSharedPreferences("userSurname", userSurname, context);
                     }
