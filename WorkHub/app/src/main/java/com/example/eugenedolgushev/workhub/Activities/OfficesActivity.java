@@ -10,13 +10,16 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.example.eugenedolgushev.workhub.AsyncTasks.GetOffices;
+import com.example.eugenedolgushev.workhub.Api.OfficeApi.OfficeApi;
+import com.example.eugenedolgushev.workhub.Api.OfficeApi.OfficeApiListener;
 import com.example.eugenedolgushev.workhub.Model.Office;
 import com.example.eugenedolgushev.workhub.OfficeList;
 import com.example.eugenedolgushev.workhub.R;
+import com.loopj.android.http.RequestParams;
 
-import static com.example.eugenedolgushev.workhub.DefaultValues.GET_OFFICES;
-import static com.example.eugenedolgushev.workhub.DefaultValues.MAIN_URL;
+import java.util.ArrayList;
+
+import static com.example.eugenedolgushev.workhub.Utils.getStringFromSharedPreferences;
 import static com.example.eugenedolgushev.workhub.Utils.hasConnection;
 import static com.example.eugenedolgushev.workhub.Utils.showAlertDialog;
 
@@ -24,8 +27,8 @@ public class OfficesActivity extends AppCompatActivity {
     private ListView lvOffices;
     private Context context;
 
-    private static final String URL = "http://192.168.0.32:3000/getOffices";
     private String cityName = "";
+    private OfficeApi officeApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,8 @@ public class OfficesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_offices);
         setTitle("Выберите офис");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        officeApi = OfficeApi.getInstance();
 
         cityName = getIntent().getExtras().getString("cityName");
 
@@ -60,16 +65,21 @@ public class OfficesActivity extends AppCompatActivity {
             }
         });
 
-        GetOffices getOfficeTask = new GetOffices(new GetOffices.AsyncResponse() {
+        getOffices();
+    }
+
+    private void getOffices() {
+        RequestParams params = new RequestParams();
+        params.put("userID", getStringFromSharedPreferences("userID", context));
+        params.put("city", cityName);
+        officeApi.getOffices(params, new OfficeApiListener() {
             @Override
-            public void processFinish(OfficeList officeList){
-                if (lvOffices != null && officeList != null) {
-                    lvOffices.setAdapter(officeList);
-                }
+            public void onOfficesLoad(ArrayList<Office> offices) {
+                OfficeList officeList = new OfficeList(context);
+                officeList.setList(offices);
+                lvOffices.setAdapter(officeList);
             }
         }, context);
-
-        getOfficeTask.execute(cityName, MAIN_URL + GET_OFFICES);
     }
 
     @Override
