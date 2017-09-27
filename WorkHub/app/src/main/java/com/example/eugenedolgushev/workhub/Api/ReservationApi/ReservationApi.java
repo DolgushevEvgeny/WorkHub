@@ -3,7 +3,7 @@ package com.example.eugenedolgushev.workhub.Api.ReservationApi;
 import android.content.Context;
 
 import com.example.eugenedolgushev.workhub.Api.BaseApi;
-import com.example.eugenedolgushev.workhub.AsyncTask.OnAsyncTaskCompleted;
+import com.example.eugenedolgushev.workhub.Api.OnAsyncTaskCompleted;
 import com.example.eugenedolgushev.workhub.Reservation;
 import com.loopj.android.http.RequestParams;
 

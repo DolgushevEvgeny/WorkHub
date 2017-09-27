@@ -1,6 +1,5 @@
 package com.example.eugenedolgushev.workhub.Api;
 
-import com.example.eugenedolgushev.workhub.AsyncTask.OnAsyncTaskCompleted;
 import com.example.eugenedolgushev.workhub.BuildConfig;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;

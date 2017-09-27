@@ -1,4 +1,4 @@
-package com.example.eugenedolgushev.workhub.AsyncTask;
+package com.example.eugenedolgushev.workhub.Api;
 
 public interface OnAsyncTaskCompleted {
 
