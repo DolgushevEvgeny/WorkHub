@@ -61,6 +61,7 @@ public class MyReservationsActivity extends AppCompatActivity
     private DBManager dbManager;
     private SQLiteDatabase database;
     private ReservationApi reservationApi;
+    private Boolean isRequest = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +148,7 @@ public class MyReservationsActivity extends AppCompatActivity
     }
 
     private void loadReservations(final RequestParams params) {
+        isRequest = true;
         reservationApi.getReservations(params, new ReservationApiListener() {
             @Override
             public void onReservationsLoad(ArrayList<Reservation> reservations) {
@@ -156,15 +158,14 @@ public class MyReservationsActivity extends AppCompatActivity
                 for (int i = 0; i < reservations.size(); ++i) {
                     dbManager.setToDB(database, dbManager, reservations.get(i), context);
                 }
+                isRequest = false;
             }
         });
     }
 
     private void getReservations() {
         RequestParams params = new RequestParams();
-        SharedPreferences sPref = context
-                .getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-        params.put("userID", sPref.getString("userID", ""));
+        params.put("userID", getStringFromSharedPreferences("userID", context));
         loadReservations(params);
     }
 
@@ -178,7 +179,9 @@ public class MyReservationsActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         if (hasConnection(context)) {
-            getReservations();
+            if (!isRequest) {
+                getReservations();
+            }
         } else {
             loadReservationFromDB();
         }
